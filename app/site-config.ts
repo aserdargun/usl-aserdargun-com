@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 
 export const baseMetadata: Metadata = {
   metadataBase: new URL("https://usl.aserdargun.com"),
-  title: { default: "Unsloth Studio Learning", template: "%s · Unsloth Studio Learning" },
+  title: { default: "USL - Unsloth Studio Learning", template: "%s · Unsloth Studio Learning" },
   description: "A bilingual, evidence-aware learning atlas for Unsloth Studio, LoRA, QLoRA, dataset engineering, evaluation, and local model deployment.",
   applicationName: "Unsloth Studio Learning",
   authors: [{ name: "Serdar Gündoğdu", url: "https://aserdargun.com" }],
