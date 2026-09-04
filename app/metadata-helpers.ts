@@ -18,10 +18,10 @@ export function atlasMetadata(locale: Locale, surface: Surface = "dashboard", sl
   const enPath = `/en/${suffix ? `${suffix}/` : ""}`;
   const canonical = locale === "tr" ? trPath : enPath;
   return {
-    title: { absolute: "Unsloth Studio Learning" },
+    title: `USL - ${title}`,
     description,
     alternates: { canonical, languages: { tr: trPath, en: enPath, "x-default": enPath } },
-    openGraph: { title, description, url: `${origin}${canonical}`, locale: locale === "tr" ? "tr_TR" : "en_US", alternateLocale: locale === "tr" ? ["en_US"] : ["tr_TR"], images: ["/og.png"] },
-    twitter: { title, description, images: ["/og.png"] },
+    openGraph: { title: `USL - ${title}`, description, url: `${origin}${canonical}`, locale: locale === "tr" ? "tr_TR" : "en_US", alternateLocale: locale === "tr" ? ["en_US"] : ["tr_TR"], images: ["/og.png"] },
+    twitter: { title: `USL - ${title}`, description, images: ["/og.png"] },
   };
 }

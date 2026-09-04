@@ -17,7 +17,7 @@ test("uses the site name as the browser title on every exported page type", asyn
   ]);
 
   for (const html of pages) {
-    assert.match(html, /<title>Unsloth Studio Learning<\/title>/);
+    assert.match(html, /<title>USL - [^<]+<\/title>/);
   }
 });
 

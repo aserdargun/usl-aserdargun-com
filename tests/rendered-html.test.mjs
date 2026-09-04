@@ -20,8 +20,8 @@ test("renders bilingual dashboards with source and visitor progress separated", 
   const [tr, en] = await Promise.all([trResponse.text(), enResponse.text()]);
   assert.match(tr, /<html lang="tr"/);
   assert.match(en, /<html lang="en"/);
-  assert.match(tr, /<title>Unsloth Studio Learning<\/title>/);
-  assert.match(en, /<title>Unsloth Studio Learning<\/title>/);
+  assert.match(tr, /<title>USL - [^<]+<\/title>/);
+  assert.match(en, /<title>USL - [^<]+<\/title>/);
   assert.doesNotMatch(`${tr}\n${en}`, /<title>[^<]*Unsloth Studio Learning Atlas<\/title>/);
   assert.match(tr, /50\/50/);
   assert.match(tr, /Kaynak ilerlemesi/);
@@ -38,9 +38,9 @@ test("renders labs, evidence, lessons, and localized metadata", async () => {
   assert.equal(labs.status, 200);
   assert.equal(evidence.status, 200);
   assert.equal(lesson.status, 200);
-  assert.match(labsHtml, /<title>Unsloth Studio Learning<\/title>/);
-  assert.match(evidenceHtml, /<title>Unsloth Studio Learning<\/title>/);
-  assert.match(lessonHtml, /<title>Unsloth Studio Learning<\/title>/);
+  assert.match(labsHtml, /<title>USL - [^<]+<\/title>/);
+  assert.match(evidenceHtml, /<title>USL - [^<]+<\/title>/);
+  assert.match(lessonHtml, /<title>USL - [^<]+<\/title>/);
   assert.doesNotMatch(`${labsHtml}\n${evidenceHtml}\n${lessonHtml}`, /<title>[^<]*Unsloth Studio Learning Atlas<\/title>/);
   assert.match(labsHtml, /Context bütçesi/);
   assert.match(labsHtml, /Simülasyon/);
