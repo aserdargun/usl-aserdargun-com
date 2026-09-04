@@ -124,7 +124,7 @@ export const flashcards: Record<Locale, Flashcard[]> = {
     { id: "fc-models-1", topic: "models", tr: { front: "Base model ne yapar?", back: "Yalnızca sonraki token tahmini yapar; talimat takip etmek zorunda değildir." }, en: { front: "What does a Base model do?", back: "It only predicts the next token; it is not required to follow instructions." } },
     { id: "fc-models-2", topic: "models", tr: { front: "Dar bir domain asistanı için en savunulabilir başlangıç?", back: "Instruct checkpoint; çünkü zaten hizalı, daha düşük öğrenme yükü." }, en: { front: "Best start for a narrow domain assistant?", back: "Instruct checkpoint; already aligned, lower learning load." } },
     // tokens
-    { id: "fc-tokens-1", topic: "tokens", tr: { front: "Context bütçesine neler girer?", back: "Sistem + template + kullanıcı + RAG + cevap." }, en: { front: "What goes into context budget?", back: "System + template + user + RAG + response." } },
+    { id: "fc-tokens-1", topic: "tokens", tr: { front: "Bağlam bütçesine neler girer?", back: "Sistem + şablon + kullanıcı + RAG + yanıt." }, en: { front: "What goes into context budget?", back: "System + template + user + RAG + response." } },
     { id: "fc-tokens-2", topic: "tokens", tr: { front: "Inference sırasında sabit kalan nedir?", back: "WQ/WK/WV ağırlıkları; Q/K/V vektörleri bağlama göre değişir." }, en: { front: "What stays fixed during inference?", back: "WQ/WK/WV weights; Q/K/V vectors change with input." } },
     // lora
     { id: "fc-lora-1", topic: "lora", tr: { front: "LoRA hangi iki matris eğitir?", back: "Yalnızca A ve B; B=0 başlangıcı taban davranışını korur." }, en: { front: "Which two matrices does LoRA train?", back: "Only A and B; B=0 start preserves base behavior." } },
@@ -133,13 +133,13 @@ export const flashcards: Record<Locale, Flashcard[]> = {
     { id: "fc-rank-1", topic: "rank", tr: { front: "Rank iki katına çıkınca LoRA parametre sayısı?", back: "Yaklaşık iki kat; r × (d_in + d_out) doğrusal ölçeklenir." }, en: { front: "What happens to LoRA params when rank doubles?", back: "Roughly doubles; r × (d_in + d_out) scales linearly." } },
     { id: "fc-rank-2", topic: "rank", tr: { front: "rsLoRA ölçeği nedir?", back: "α/√r (standart LoRA: α/r)." }, en: { front: "What is rsLoRA scale?", back: "α/√r (standard LoRA: α/r)." } },
     // steps
-    { id: "fc-steps-1", topic: "steps", tr: { front: "Effective batch nasıl hesaplanır?", back: "μ × accumulation × GPU sayısı." }, en: { front: "How is effective batch computed?", back: "μ × accumulation × GPU count." } },
+    { id: "fc-steps-1", topic: "steps", tr: { front: "Etkin toplu iş nasıl hesaplanır?", back: "Mikro toplu iş × birikim × GPU sayısı." }, en: { front: "How is effective batch computed?", back: "μ × accumulation × GPU count." } },
     { id: "fc-steps-2", topic: "steps", tr: { front: "Accumulation 8 ne anlama gelir?", back: "8 backward + 1 optimizer step. Ağırlık 1 kez güncellenir." }, en: { front: "What does accumulation 8 mean?", back: "8 backward passes + 1 optimizer step. Weights update once." } },
     // loss
     { id: "fc-loss-1", topic: "loss", tr: { front: "Train↓ Val↑ ne sinyal verir?", back: "Klasik overfitting." }, en: { front: "Train↓ Val↑ signals what?", back: "Classic overfitting." } },
-    { id: "fc-loss-2", topic: "loss", tr: { front: "Domain↑ Genel↓ neyi gösterir?", back: "Forgetting veya adapter kaynaklı davranışsal girişim." }, en: { front: "Domain↑ General↓ indicates?", back: "Forgetting or adapter-induced behavioral interference." } },
+    { id: "fc-loss-2", topic: "loss", tr: { front: "Alan↑ Genel↓ neyi gösterir?", back: "Unutma veya adaptör kaynaklı davranışsal girişim." }, en: { front: "Domain↑ General↓ indicates?", back: "Forgetting or adapter-induced behavioral interference." } },
     // templates
-    { id: "fc-tpl-1", topic: "templates", tr: { front: "Doğru yaklaşım nedir?", back: "role/content bağımsız sakla, her modelin template'i ile render et." }, en: { front: "What is the right approach?", back: "Store role/content independently, render with each model's template." } },
+    { id: "fc-tpl-1", topic: "templates", tr: { front: "Doğru yaklaşım nedir?", back: "Rol/içerik kayıtlarını bağımsız sakla, her modelin şablonuyla işle." }, en: { front: "What is the right approach?", back: "Store role/content independently, render with each model's template." } },
     { id: "fc-tpl-2", topic: "templates", tr: { front: "Yanlış delimiter ne yapar?", back: "Cevap loss dışında kalabilir ya da prompt yanlışlıkla eğitilir." }, en: { front: "What does a wrong delimiter do?", back: "Assistant answers may be excluded from loss; prompt may be trained by accident." } },
     // evaluation
     { id: "fc-eval-1", topic: "evaluation", tr: { front: "Veri karışımı (önerilen)?", back: "%55 standart, %10 parafraz, %15 eksik bilgi, %10 negatif, %10 eskalasyon." }, en: { front: "Recommended data mix?", back: "55% standard, 10% paraphrase, 15% missing info, 10% negative, 10% escalation." } },
@@ -183,7 +183,7 @@ export const conceptDepth: Record<string, Partial<Record<Locale, ConceptDepth>>>
     tr: {
       layman: { tr: "Her kelimeyi bilgisayar tek parça halinde okuyamaz; önce küçük parçalara böler. Bu parçaların her birine 'token' denir. Türkçe, İngilizce'den daha karmaşık olduğu için daha çok parçaya bölünür. Bu, modele gönderdiğin metnin 'daha ağır' olması demektir.", en: "The computer cannot read each word as a whole; it first breaks it into small pieces. Each piece is called a token. Turkish is more complex than English, so it splits into more pieces. That means the text you send the model is 'heavier'." },
       undergrad: { tr: "BPE veya SentencePiece gibi alt-sözcük tokenizer'lar, kelimeleri sıklık temelli parçalara ayırır. Türkçe gibi eklemeli (agglutinative) diller, sık başvurulan ekler yüzünden tek bir kelimede çok sayıda alt-sözcük üretir. Bu, context penceresinin daha hızlı dolması ve maliyetin artması anlamına gelir.", en: "Sub-word tokenizers like BPE or SentencePiece split words into frequency-based pieces. Agglutinative languages like Turkish generate many sub-pieces per word due to rich morphology. This means the context window fills faster and cost rises." },
-      advanced: { tr: "BPE merges sıklık temellidir; nadir byte-pair'ler sona kalır. Türkçe'de morfoloji yüzünden vocab coverage daha geniş bir dağılım gerektirir; bu, average tokens-per-word oranını İngilizce'nin ~1.5-2 katına çıkarabilir. Doğru ölçüm yalnızca hedef tokenizer.apply(...) ile yapılır; truncation/padding token ID'leri de dahil edilmelidir.", en: "BPE merges are frequency-based; rare byte-pairs remain at the end. In Turkish, morphology forces a wider distribution of vocab coverage; this can push the average tokens-per-word ratio to 1.5-2× English. The correct measurement is only via target tokenizer.apply(...); truncation/padding token IDs must also be counted." },
+      advanced: { tr: "BPE birleştirmeleri sıklık temellidir; nadir bayt çiftleri sona kalır. Türkçe morfolojisi parça dağılımını etkileyebilir, ancak fark tokenizer'a ve metne bağlıdır. Doğru ölçüm hedef modelin gerçek tokenizer'ıyla yapılmalı; kesme, doldurma ve özel tokenlar da hesaba katılmalıdır.", en: "BPE merges are frequency-based; rare byte pairs remain at the end. Turkish morphology can affect the piece distribution, but the difference depends on the tokenizer and text. Measure with the target model's real tokenizer, including truncation, padding, and special tokens." },
     },
   },
   lora: {
@@ -209,7 +209,7 @@ export const conceptDepth: Record<string, Partial<Record<Locale, ConceptDepth>>>
   },
   loss: {
     tr: {
-      layman: { tr: "Sınava çalışırken yaptığın deneme testleri training loss; sınavın kendisi validation loss. Düşük deneme puanı, yüksek sınav puanunu garanti etmez. Sadece deneme skoruna bakıp 'bitti' demek, gerçek sınavda hayal kırıklığı yaratır.", en: "Practice tests during your study are training loss; the exam itself is validation loss. A low practice score does not guarantee a high exam score. Calling it done by practice score alone creates disappointment at the real exam." },
+      layman: { tr: "Sınava çalışırken yaptığın deneme testleri eğitim kaybı; sınavın kendisi doğrulama kaybı gibidir. Düşük deneme kaybı, yüksek sınav puanını garanti etmez. Sadece deneme sonucuna bakıp 'bitti' demek, gerçek sınavda hayal kırıklığı yaratır.", en: "Practice tests during your study are training loss; the exam itself is validation loss. A low practice score does not guarantee a high exam score. Calling it done by practice score alone creates disappointment at the real exam." },
       undergrad: { tr: "Training loss, optimize edilen hedefe uyumu ölçer. Validation loss, görülmemiş split üzerindeki genellemeyi ölçer. Train düşerken validation yükseliyorsa overfitting. Catastrophic forgetting farklıdır: yeni yetenek kazanırken eski/genel yetenek geriler. Loss tek başına kalite kanıtı değildir; domain/format/safety metrikleri de ölçülmelidir.", en: "Training loss measures fit to the optimized target. Validation loss measures generalization on an unseen split. If train falls while validation rises, that is overfitting. Catastrophic forgetting is different: new ability improves while prior/general ability declines. Loss is not by itself a quality proof; domain/format/safety metrics must also be measured." },
       advanced: { tr: "Loss eğrisi tek başına yeterli değildir: gradient norm, learning rate ve batch composition da izlenmelidir. Validation loss 'U-şekli' (val↓ sonra val↑) klasik overfitting sinyalidir; 'monoton artış' ise data mismatch / training instability'ye işaret eder. Forgetting tespiti için orthogonal evaluation (MMLU, domain benchmark) veya FWT/PWT oranı kullanılır. Adapter kapatınca davranış düzeliyorsa, sorun tabanda değil adapter kaynaklı girişimdir.", en: "Loss curve alone is not enough: gradient norm, learning rate, and batch composition should also be monitored. The U-shape in validation loss (val↓ then val↑) is the classic overfitting signal; monotonic increase signals data mismatch or training instability. Forgetting is detected with orthogonal evaluation (MMLU, domain benchmark) or FWT/PWT ratio. If behavior recovers when the adapter is disabled, the problem is not the base but adapter-induced interference." },
     },
@@ -297,7 +297,7 @@ export const paperReadings: Record<Locale, PaperSummary[]> = {
       authors: "Hu et al.",
       tr: {
         title: "LoRA: Low-Rank Adaptation of Large Language Models",
-        takeaway: "ΔW'yi düşük-rank manifold'a izdüşürerek eğitilebilir parametreleri 10.000× azaltır. Adapter orijinal modele geri dönüşlü olarak eklenir.",
+        takeaway: "ΔW'yi düşük-rank bir güncellemeyle ifade ederek, makaledeki GPT-3 örneklerinde eğitilebilir parametre sayısını 10.000 kata kadar azaltır. Adaptör temel modele geri dönüşlü olarak eklenir.",
         relevance: "LoRA kavramının orijinal kaynağı. r × (d_in + d_out) formülü, alpha/r ölçeği burada gelir.",
         citation: "Hu, E.J. et al. (2021). LoRA: Low-Rank Adaptation of Large Language Models. arXiv:2106.09685.",
       },
@@ -314,13 +314,13 @@ export const paperReadings: Record<Locale, PaperSummary[]> = {
       authors: "Dettmers et al.",
       tr: {
         title: "QLoRA: Efficient Finetuning of Quantized LLMs",
-        takeaway: "NF4 (4-bit normal float) quantization, double quantization ve paged optimizer states ile 65B modeli tek 48GB GPU'da fine-tune eder. 16 GB sınıfında çalışmasının nedeni budur.",
+        takeaway: "NF4 (4 bit normal kayan nokta), çift niceleme ve sayfalı iyileştirici durumlarıyla 65B modeli tek bir 48 GB GPU'da ince ayarlar. Bu sonuç bellek tasarrufunu gösterir; belirli bir modelin 16 GB'a sığacağını garanti etmez.",
         relevance: "QLoRA, NF4, double-quantization, page optimizer kavramlarının orijinal kaynağı.",
         citation: "Dettmers, T. et al. (2023). QLoRA: Efficient Finetuning of Quantized LLMs. NeurIPS.",
       },
       en: {
         title: "QLoRA: Efficient Finetuning of Quantized LLMs",
-        takeaway: "NF4 (4-bit normal float) quantization, double quantization, and paged optimizer states fine-tune a 65B model on a single 48GB GPU. This is why it works in the 16 GB class.",
+        takeaway: "NF4 (4-bit normal float), double quantization, and paged optimizer states fine-tune a 65B model on a single 48 GB GPU. This demonstrates memory savings but does not guarantee that a particular model fits in 16 GB.",
         relevance: "Original source of QLoRA, NF4, double-quantization, page optimizer concepts.",
         citation: "Dettmers, T. et al. (2023). QLoRA: Efficient Finetuning of Quantized LLMs. NeurIPS.",
       },
@@ -398,12 +398,12 @@ export const citationKit: Record<Locale, Citation[]> = {
       topic: "tokens",
       evidence: "observed",
       tr: {
-        text: "Türkçe, çoğu İngilizce-merkezli BPE tokenizer'da ortalama 1.5-2× daha fazla token üretir; bu, context penceresi ve inference maliyetini doğrudan etkiler.",
-        usage: "Türkçe-düşük tokenization maliyeti için.",
+        text: "Türkçe token maliyeti tokenizer'a göre değişir; bağlam ve çıkarım maliyeti hedef modelin gerçek tokenizer'ıyla ölçülmelidir.",
+        usage: "Türkçe tokenlaştırma maliyetini açıklamak için.",
       },
       en: {
-        text: "Turkish produces on average 1.5-2× more tokens in most English-centric BPE tokenizers; this directly affects context window and inference cost.",
-        usage: "For the low tokenization cost of Turkish.",
+        text: "Turkish token cost varies by tokenizer; context and inference cost must be measured with the target model's actual tokenizer.",
+        usage: "To discuss Turkish tokenization cost.",
       },
     },
     {
@@ -476,7 +476,7 @@ export function vramEstimate(input: VramInput): VramEstimate {
   const adapterParams = input.adapterRank * input.hiddenDim * 2 * input.adapterMatrices;
   const adapter = (adapterParams * 4) / (1024 ** 3);
 
-  // Optimizer (Adam): 2 momentum + 2 variance = 8 byte per trainable param (fp32)
+  // Optimizer (Adam): momentum + variance = 8 bytes per trainable parameter (fp32)
   // Biz sadece adapter eğitiyoruz, bu yüzden yalnızca adapter üzerinden.
   const optimizer = (adapterParams * 8) / (1024 ** 3);
 
@@ -484,9 +484,9 @@ export function vramEstimate(input: VramInput): VramEstimate {
   const gradients = (adapterParams * 4) / (1024 ** 3);
 
   // Aktivasyon: yaklaşık olarak batch × seq × hidden × 4 byte × 2 (fwd+bwd)
-  // Gradient checkpointing ile ~sqrt(seq) factor.
+  // Gradient checkpointing için öğretici bir bellek azaltma katsayısı.
   const actBytes = input.microBatch * input.contextLength * input.hiddenDim * 4 * 2;
-  const ckptFactor = input.gradientCheckpointing ? Math.sqrt(input.contextLength / 1024) : 1;
+  const ckptFactor = input.gradientCheckpointing ? 0.55 : 1;
   const activations = (actBytes * ckptFactor) / (1024 ** 3);
 
   // KV cache (inference): 2 × layers × seq × heads × head_dim × 2 byte (fp16)

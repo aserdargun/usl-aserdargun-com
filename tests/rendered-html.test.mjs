@@ -42,14 +42,41 @@ test("renders labs, evidence, lessons, and localized metadata", async () => {
   assert.match(evidenceHtml, /<title>USL - [^<]+<\/title>/);
   assert.match(lessonHtml, /<title>USL - [^<]+<\/title>/);
   assert.doesNotMatch(`${labsHtml}\n${evidenceHtml}\n${lessonHtml}`, /<title>[^<]*Unsloth Studio Learning Atlas<\/title>/);
-  assert.match(labsHtml, /Context bütçesi/);
+  assert.match(labsHtml, /Bağlam bütçesi/);
   assert.match(labsHtml, /Simülasyon/);
-  assert.match(evidenceHtml, /Pipeline geçti\. Kalite kazanımı kanıtlanmadı\./);
-  assert.match(evidenceHtml, /peak değil/);
+  assert.match(evidenceHtml, /İşlem hattı geçti\. Kalite kazanımı kanıtlanmadı\./);
+  assert.match(evidenceHtml, /en iyi değer değil/);
+  assert.doesNotMatch(`${labsHtml}\n${evidenceHtml}`, /Context bütçesi|Maximum|Pipeline geçti|peak değil/);
   assert.match(lessonHtml, /Base, Instruct, and Reasoning/);
   assert.match(lessonHtml, /First thought/);
+  assert.match(lessonHtml, /raw pretrained/);
+  assert.doesNotMatch(lessonHtml, /ham ön-eğitim|talimatlara hizalı|adım adım düşünür/);
   assert.match(lessonHtml, /hreflang="tr"/i);
   assert.match(lessonHtml, /hreflang="en"/i);
+});
+
+test("renders the new Turkish learning surfaces without stray English UI", async () => {
+  const [visualizeResponse, flashcardsResponse] = await Promise.all([
+    render("/tr/visualize"),
+    render("/tr/flashcards"),
+  ]);
+  assert.equal(visualizeResponse.status, 200);
+  assert.equal(flashcardsResponse.status, 200);
+  const [visualize, flashcards] = await Promise.all([
+    visualizeResponse.text(),
+    flashcardsResponse.text(),
+  ]);
+
+  assert.match(visualize, /GÖRSEL VE ETKİLEŞİMLİ/);
+  assert.match(visualize, /Tokenizer Deneme Alanı/);
+  assert.match(visualize, /Eğitim Kaybı Simülatörü/);
+  assert.match(visualize, /Dikkat Isı Haritası/);
+  assert.match(visualize, /type="range" min="5" max="50" value="40"/);
+  assert.doesNotMatch(visualize, /GÖRSEL &amp; İNTERAKTİF|Eğitim Loss|Attention Heatmap|Base quantization|Context length|Micro batch/);
+
+  assert.match(flashcards, /Tekrar Kartları/);
+  assert.match(flashcards, /öğretici bir programdır; kişisel etki kanıtı değildir/);
+  assert.doesNotMatch(flashcards, /Kalıcı öğrenme için kanıtlanmış yöntemdir|😣|👍|✨|💡/u);
 });
 
 test("ships SEO and AI-discovery assets and removes starter surfaces", async () => {

@@ -3,7 +3,7 @@ import { lessons, type Locale, type Surface } from "./atlas-data";
 
 const origin = "https://usl.aserdargun.com";
 const surfaceTitles: Record<Locale, Record<Surface, string>> = {
-  tr: { dashboard: "Panel", roadmap: "12 Haftalık Yol Haritası", labs: "Etkileşimli Laboratuvarlar", evidence: "Deney ve Kanıt Kaydı", "data-evaluation": "Veri ve Değerlendirme", journey: "Öğrenme Yolculuğu", visualize: "Görsel ve İnteraktif Laboratuvar", flashcards: "Aralıklı Tekrar Kartları" },
+  tr: { dashboard: "Panel", roadmap: "12 Haftalık Yol Haritası", labs: "Etkileşimli Laboratuvarlar", evidence: "Deney ve Kanıt Kaydı", "data-evaluation": "Veri ve Değerlendirme", journey: "Öğrenme Yolculuğu", visualize: "Görsel ve Etkileşimli Laboratuvar", flashcards: "Aralıklı Tekrar Kartları" },
   en: { dashboard: "Dashboard", roadmap: "12-Week Roadmap", labs: "Interactive Labs", evidence: "Experiment and Evidence Record", "data-evaluation": "Data and Evaluation", journey: "Learning Journey", visualize: "Visual and Interactive Lab", flashcards: "Spaced Repetition Cards" },
 };
 
@@ -12,7 +12,7 @@ export function atlasMetadata(locale: Locale, surface: Surface = "dashboard", sl
   const lesson = slug ? lessons[locale].find((item) => item.slug === slug) : undefined;
   const title = lesson?.title ?? surfaceTitles[locale][surface];
   const description = lesson?.summary ?? (locale === "tr"
-    ? "Unsloth Studio, LoRA, QLoRA, dataset mühendisliği ve değerlendirme için kanıt odaklı iki dilli öğrenme atlası."
+    ? "Unsloth Studio, LoRA, QLoRA, veri kümesi mühendisliği ve değerlendirme için kanıt odaklı iki dilli öğrenme atlası."
     : "An evidence-aware bilingual learning atlas for Unsloth Studio, LoRA, QLoRA, dataset engineering, and evaluation.");
   const trPath = `/tr/${suffix ? `${suffix}/` : ""}`;
   const enPath = `/en/${suffix ? `${suffix}/` : ""}`;

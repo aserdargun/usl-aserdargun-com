@@ -118,11 +118,11 @@ export function FlashcardsPage({ locale }: { locale: Locale }) {
     <section className="surface-stack">
       <div className="page-intro">
         <p className="eyebrow">{tr ? "ARALIKLI TEKRAR · 5 KUTU" : "SPACED REPETITION · 5 BOXES"}</p>
-        <h1>{tr ? "Flashcards" : "Flashcards"}</h1>
+        <h1>{tr ? "Tekrar Kartları" : "Flashcards"}</h1>
         <p>
           {tr
-            ? "Her kavram için ön/arka kart. “Zor” kutu numarasını düşürür, “kolay” yükseltir. Aralıklar 1, 3, 7, 14 ve 30 gün. Kalıcı öğrenme için kanıtlanmış yöntemdir (Ebbinghaus, 1885)."
-            : "Front/back card for each concept. 'Hard' lowers the box number, 'easy' raises it. Spacing is 1, 3, 7, 14, 30 days. A proven method for durable learning (Ebbinghaus, 1885)."}
+            ? "Her kavram için ön/arka kart. “Zor” kutu numarasını düşürür, “kolay” yükseltir. Aralıklar 1, 3, 7, 14 ve 30 gündür. Unutma eğrisi çalışmalarından esinlenen bu sabit aralıklar öğretici bir programdır; kişisel etki kanıtı değildir."
+            : "A front/back card for each concept. 'Hard' lowers the box number and 'easy' raises it. Spacing is 1, 3, 7, 14, and 30 days. Inspired by forgetting-curve research, these fixed intervals are a teaching schedule, not evidence of individual effectiveness."}
         </p>
         <EvidencePillTr level="simulation" tr={tr} />
       </div>
@@ -156,7 +156,7 @@ export function FlashcardsPage({ locale }: { locale: Locale }) {
             <div className="flash-card-face flash-card-back">
               <span className="kicker">{tr ? "ARKA YÜZ" : "BACK"}</span>
               <p>{card[locale].back}</p>
-              {card[locale].hint && <small>💡 {card[locale].hint}</small>}
+              {card[locale].hint && <small>{tr ? "İpucu: " : "Hint: "}{card[locale].hint}</small>}
             </div>
           </div>
         </div>
@@ -169,15 +169,15 @@ export function FlashcardsPage({ locale }: { locale: Locale }) {
       {card && flipped && (
         <div className="flash-actions">
           <button onClick={() => answer("hard")} className="flash-btn flash-btn-hard">
-            <b>😣 {tr ? "Zor" : "Hard"}</b>
+            <b>{tr ? "Zor" : "Hard"}</b>
             <span>{tr ? "1 gün sonra" : "in 1 day"}</span>
           </button>
           <button onClick={() => answer("good")} className="flash-btn flash-btn-good">
-            <b>👍 {tr ? "İyi" : "Good"}</b>
+            <b>{tr ? "İyi" : "Good"}</b>
             <span>{tr ? `${srsBoxes[Math.min(srsBoxes.length - 1, (progress[card.id]?.box ?? 0) + 1)]} gün sonra` : `in ${srsBoxes[Math.min(srsBoxes.length - 1, (progress[card.id]?.box ?? 0) + 1)]} days`}</span>
           </button>
           <button onClick={() => answer("easy")} className="flash-btn flash-btn-easy">
-            <b>✨ {tr ? "Kolay" : "Easy"}</b>
+            <b>{tr ? "Kolay" : "Easy"}</b>
             <span>{tr ? `${srsBoxes[Math.min(srsBoxes.length - 1, (progress[card.id]?.box ?? 0) + 2)]} gün sonra` : `in ${srsBoxes[Math.min(srsBoxes.length - 1, (progress[card.id]?.box ?? 0) + 2)]} days`}</span>
           </button>
         </div>

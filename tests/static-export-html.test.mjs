@@ -33,3 +33,9 @@ test("publishes canonical and source links for the usl deployment contract", asy
     assert.match(html, /https:\/\/github\.com\/aserdargun\/usl-aserdargun-com/);
   }
 });
+
+test("publishes the current sitemap verification date", async () => {
+  const sitemap = await readFile(new URL("out/sitemap.xml", root), "utf8");
+  assert.match(sitemap, /2026-09-04/);
+  assert.doesNotMatch(sitemap, /2026-08-10/);
+});

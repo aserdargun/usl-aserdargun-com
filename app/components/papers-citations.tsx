@@ -26,7 +26,7 @@ export function PaperReadingHub({ locale }: { locale: Locale }) {
       <div className="section-heading">
         <div>
           <p className="kicker">{tr ? "OKUMA LİSTESİ" : "READING LIST"}</p>
-          <h2>{tr ? "Klasik Makaleler" : "Classic Papers"}</h2>
+          <h2>{tr ? "Klasik makaleler" : "Classic Papers"}</h2>
           <p>
             {tr
               ? "Her kavramın matematiksel temeli. 1 sayfalık özet; orijinal makaleyi okumadan önce başlangıç noktası olarak kullan."
@@ -49,7 +49,7 @@ export function PaperReadingHub({ locale }: { locale: Locale }) {
               <p>{paper[locale].relevance}</p>
             </div>
             <div className="paper-citation">
-              <span className="kicker">{tr ? "ALıNTı" : "CITATION"}</span>
+              <span className="kicker">{tr ? "ALINTI" : "CITATION"}</span>
               <p><code>{paper[locale].citation}</code></p>
             </div>
           </article>
@@ -62,16 +62,19 @@ export function PaperReadingHub({ locale }: { locale: Locale }) {
 export function CitationKitPanel({ locale }: { locale: Locale }) {
   const tr = locale === "tr";
   const cites = citationKit[locale];
+  const topics = tr
+    ? { lora: "LoRA", evaluation: "değerlendirme", tokens: "tokenlar", steps: "adımlar", templates: "şablonlar" }
+    : { lora: "LoRA", evaluation: "evaluation", tokens: "tokens", steps: "steps", templates: "templates" };
   return (
     <section className="citation-kit">
       <div className="section-heading">
         <div>
-          <p className="kicker">{tr ? "ALıNTı KİTİ" : "CITATION KIT"}</p>
-          <h2>{tr ? "Tez ve Rapor için Cümleler" : "Sentences for Thesis and Reports"}</h2>
+          <p className="kicker">{tr ? "ALINTI KİTİ" : "CITATION KIT"}</p>
+          <h2>{tr ? "Tez ve rapor için cümleler" : "Sentences for Thesis and Reports"}</h2>
           <p>
             {tr
-              ? "Doğrudan kullanılabilir, kanıt seviyesi etiketli cümleler. Üniversite ödevlerinde, tezlerde ve blog yazılarında atıf için."
-              : "Drop-in, evidence-labeled sentences. Use in university assignments, theses, and blog posts with proper citation."}
+              ? "Kanıt seviyesi etiketli taslak cümleler. Kullanmadan önce özgün kaynağı doğrula ve doğrudan o kaynağa atıf yap."
+              : "Evidence-labeled draft sentences. Verify the original source and cite it directly before using them."}
           </p>
         </div>
       </div>
@@ -80,7 +83,7 @@ export function CitationKitPanel({ locale }: { locale: Locale }) {
           <article key={c.id} className="citation-item">
             <div className="citation-head">
               <EvidencePill locale={locale} level={c.evidence} />
-              <span className="kicker">{c.topic}</span>
+              <span className="kicker">{topics[c.topic as keyof typeof topics] ?? c.topic}</span>
               <span className="kicker">{tr ? "kullanım:" : "usage:"} {c[locale].usage}</span>
             </div>
             <blockquote>{c[locale].text}</blockquote>

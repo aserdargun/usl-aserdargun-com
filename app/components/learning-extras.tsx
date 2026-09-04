@@ -13,20 +13,18 @@ import { conceptDepth, prerequisites, type DepthLevel } from "../atlas-extras";
 // seviyesini seçer. Kalıcı öğrenme için elaboration + self-explanation.
 // ---------------------------------------------------------------------------
 
-const levelMeta: Record<DepthLevel, { tr: string; en: string; emoji: string; description: { tr: string; en: string } }> = {
+const levelMeta: Record<DepthLevel, { tr: string; en: string; description: { tr: string; en: string } }> = {
   layman: {
     tr: "GÜNLÜK DİL",
     en: "EVERYDAY",
-    emoji: "🌱",
     description: {
       tr: "Kavramı bir benzetme ile anlatır. Üst sınıf lise / lisans başlangıç.",
       en: "Explains the concept through an analogy. High school / undergrad start.",
     },
   },
   undergrad: {
-    tr: "Lİsans",
+    tr: "LİSANS",
     en: "UNDERGRAD",
-    emoji: "🎓",
     description: {
       tr: "Üniversite düzeyinde; formüller, mimari kararlar ve sayılar.",
       en: "University level; formulas, architectural decisions, and numbers.",
@@ -35,9 +33,8 @@ const levelMeta: Record<DepthLevel, { tr: string; en: string; emoji: string; des
   advanced: {
     tr: "İLERİ",
     en: "ADVANCED",
-    emoji: "🔬",
     description: {
-      tr: "Araştırma düzeyinde; orijinal makalelere referanslar, edge case'ler.",
+      tr: "Araştırma düzeyinde; orijinal makalelere referanslar ve uç durumlar.",
       en: "Research level; references to original papers, edge cases.",
     },
   },
@@ -58,7 +55,7 @@ export function ConceptDepth({ locale, lessonId }: { locale: Locale; lessonId: s
         <p className="kicker">{tr ? "KAVRAM DERİNLİĞİ" : "CONCEPT DEPTH"}</p>
         <p className="concept-depth-sub">
           {tr
-            ? "Aynı kavramı üç derinlikte anlat. Seviyeni seç, anında geç. Üniversite öğrencisi için önerilen başlangıç: Lİsans."
+            ? "Aynı kavramı üç derinlikte anlat. Seviyeni seç, anında geç. Üniversite öğrencisi için önerilen başlangıç: LİSANS."
             : "Read the same concept at three depths. Pick a level, switch instantly. Recommended starting point for university students: UNDERGRAD."}
         </p>
       </div>
@@ -75,7 +72,6 @@ export function ConceptDepth({ locale, lessonId }: { locale: Locale; lessonId: s
               onClick={() => setActive(level)}
               type="button"
             >
-              <span className="concept-depth-emoji" aria-hidden>{meta.emoji}</span>
               <span className="concept-depth-label">{tr ? meta.tr : meta.en}</span>
               <span className="concept-depth-desc">{tr ? meta.description.tr : meta.description.en}</span>
             </button>

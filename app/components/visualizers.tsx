@@ -42,7 +42,7 @@ export function TokenizerPlayground({ locale }: { locale: Locale }) {
       <div className="viz-head">
         <span className="lab-index">V01</span>
         <div>
-          <h2>{tr ? "Tokenizer Playground" : "Tokenizer Playground"}</h2>
+          <h2>{tr ? "Tokenizer Deneme Alanı" : "Tokenizer Playground"}</h2>
           <p className="viz-subtitle">
             {tr
               ? "Türkçe ve İngilizce metni BPE-benzeri parçalara ayırır. Sonuçlar yaklaşıktır; üretim kararları için gerçek tokenizer ile ölçüm zorunludur."
@@ -59,7 +59,11 @@ export function TokenizerPlayground({ locale }: { locale: Locale }) {
             onClick={() => setActiveId(item.id)}
             type="button"
           >
-            <span className="kicker">{item.id.replace(/^(tr|en)-/, "").toUpperCase()}</span>
+            <span className="kicker">{{
+              daily: tr ? "GÜNLÜK" : "DAILY",
+              compound: tr ? "BİLEŞİK" : "COMPOUND",
+              agglutination: tr ? "EKLEMELİ" : "AGGLUTINATION",
+            }[item.id.replace(/^(tr|en)-/, "")]}</span>
             <span className="tokenizer-sample-note">{item[locale].note}</span>
           </button>
         ))}
@@ -103,7 +107,7 @@ export function TokenizerPlayground({ locale }: { locale: Locale }) {
         <b>{tr ? "Karşılaştırma" : "Comparison"}</b>
         <span>
           {tr
-            ? `Türkçe metin, İngilizce karşılığına göre yaklaşık ${ratio.toFixed(2)}× daha fazla token üretiyor. Bu, context penceresini ve inference maliyetini doğrudan etkiler.`
+            ? `Türkçe metin, İngilizce karşılığına göre yaklaşık ${ratio.toFixed(2)}× daha fazla token üretiyor. Bu, bağlam penceresini ve çıkarım maliyetini doğrudan etkiler.`
             : `Turkish produces about ${ratio.toFixed(2)}× more tokens than its English counterpart. This directly affects the context window and inference cost.`}
         </span>
       </div>
@@ -140,8 +144,8 @@ export function VRAMVisualizer({ locale }: { locale: Locale }) {
 
   const segments = [
     { key: "weights", label: tr ? "Model ağırlıkları" : "Model weights", value: estimate.weights, color: "var(--blue)" },
-    { key: "adapter", label: tr ? "Adapter" : "Adapter", value: estimate.adapter, color: "var(--orange)" },
-    { key: "optimizer", label: tr ? "Optimizer" : "Optimizer", value: estimate.optimizer, color: "var(--yellow)" },
+    { key: "adapter", label: tr ? "Adaptör" : "Adapter", value: estimate.adapter, color: "var(--orange)" },
+    { key: "optimizer", label: tr ? "İyileştirici" : "Optimizer", value: estimate.optimizer, color: "var(--yellow)" },
     { key: "gradients", label: tr ? "Gradyanlar" : "Gradients", value: estimate.gradients, color: "var(--green)" },
     { key: "activations", label: tr ? "Aktivasyonlar" : "Activations", value: estimate.activations, color: "var(--red)" },
   ];
@@ -159,7 +163,7 @@ export function VRAMVisualizer({ locale }: { locale: Locale }) {
           <h2>{tr ? "VRAM Bütçesi Görselleştirici" : "VRAM Budget Visualizer"}</h2>
           <p className="viz-subtitle">
             {tr
-              ? "Model, adapter, optimizer, gradyan ve aktivasyon paylarını görsel olarak ayırır. Rakamlar yaklaşıktır; gerçek ölçüm nvidia-smi ile yapılmalıdır."
+              ? "Model, adaptör, iyileştirici, gradyan ve aktivasyon paylarını görsel olarak ayırır. Rakamlar yaklaşıktır; gerçek ölçüm nvidia-smi ile yapılmalıdır."
               : "Separates model, adapter, optimizer, gradient, and activation shares visually. Numbers are approximate; real measurement should use nvidia-smi."}
           </p>
         </div>
@@ -178,7 +182,7 @@ export function VRAMVisualizer({ locale }: { locale: Locale }) {
             </select>
           </label>
           <label className="field">
-            <span>{tr ? "Base quantization" : "Base quantization"}</span>
+            <span>{tr ? "Taban niceleme" : "Base quantization"}</span>
             <select value={quantizationBits} onChange={(e) => setQuantizationBits(Number(e.target.value) as 4 | 8 | 16)}>
               <option value={4}>NF4 (4-bit)</option>
               <option value={8}>INT8</option>
@@ -186,20 +190,20 @@ export function VRAMVisualizer({ locale }: { locale: Locale }) {
             </select>
           </label>
           <label className="field">
-            <span>{tr ? "LoRA rank" : "LoRA rank"}</span>
+            <span>{tr ? "LoRA rankı" : "LoRA rank"}</span>
             <input type="number" min={1} max={256} value={adapterRank} onChange={(e) => setAdapterRank(Number(e.target.value))} />
           </label>
           <label className="field">
-            <span>{tr ? "Context length" : "Context length"}</span>
+            <span>{tr ? "Bağlam uzunluğu" : "Context length"}</span>
             <input type="number" min={256} max={32768} step={256} value={contextLength} onChange={(e) => setContextLength(Number(e.target.value))} />
           </label>
           <label className="field">
-            <span>{tr ? "Micro batch" : "Micro batch"}</span>
+            <span>{tr ? "Mikro toplu iş" : "Micro batch"}</span>
             <input type="number" min={1} max={8} value={microBatch} onChange={(e) => setMicroBatch(Number(e.target.value))} />
           </label>
           <label className="field field-check">
             <input type="checkbox" checked={gradientCheckpointing} onChange={(e) => setGradientCheckpointing(e.target.checked)} />
-            <span>{tr ? "Gradient checkpointing" : "Gradient checkpointing"}</span>
+            <span>{tr ? "Gradyan denetim noktaları" : "Gradient checkpointing"}</span>
           </label>
           <label className="field">
             <span>{tr ? "GPU bütçesi (GiB)" : "GPU budget (GiB)"}</span>
@@ -257,7 +261,7 @@ export function VRAMVisualizer({ locale }: { locale: Locale }) {
         <b>{estimate.fits ? (tr ? "Bütçeye sığıyor" : "Fits the budget") : (tr ? "Bütçeyi aşıyor" : "Exceeds the budget")}</b>
         <span>
           {tr
-            ? `KV cache (inference) tahmini: ${estimate.kvCache.toFixed(2)} GiB. KV cache inference zamanı ek bellek gerektirir; eğitim sırasında sayılmaz.`
+            ? `KV önbelleği (çıkarım) tahmini: ${estimate.kvCache.toFixed(2)} GiB. KV önbelleği çıkarım sırasında ek bellek gerektirir; eğitim sırasında sayılmaz.`
             : `KV cache (inference) estimate: ${estimate.kvCache.toFixed(2)} GiB. KV cache adds memory at inference time; it is not counted during training.`}
         </span>
       </div>
@@ -294,18 +298,18 @@ export function LossSimulator({ locale }: { locale: Locale }) {
   const yMin = 0.5, yMax = 3.0;
   const yScale = (v: number) => h - padY - ((v - yMin) / (yMax - yMin)) * (h - 2 * padY);
 
-  const trainPath = sim.train.map((v, i) => `${i === 0 ? "M" : "L"} ${xScale(i)} ${yScale(v)}`).join(" ");
-  const valPath = sim.val.map((v, i) => `${i === 0 ? "M" : "L"} ${xScale(i)} ${yScale(v)}`).join(" ");
+  const trainPath = sim.train.map((v, i) => `${i === 0 ? "M" : "L"} ${xScale(i).toFixed(3)} ${yScale(v).toFixed(3)}`).join(" ");
+  const valPath = sim.val.map((v, i) => `${i === 0 ? "M" : "L"} ${xScale(i).toFixed(3)} ${yScale(v).toFixed(3)}`).join(" ");
 
   return (
     <article className="viz-card viz-card-wide">
       <div className="viz-head">
         <span className="lab-index">V03</span>
         <div>
-          <h2>{tr ? "Eğitim Loss Simülatörü" : "Training Loss Simulator"}</h2>
+          <h2>{tr ? "Eğitim Kaybı Simülatörü" : "Training Loss Simulator"}</h2>
           <p className="viz-subtitle">
             {tr
-              ? "Learning rate, batch, epoch ve overfit riskini değiştir; train/val loss eğrilerini canlı izle. Üstel bozunma + overfit yükselişi modellemesidir; gerçek koşu yerine geçmez."
+              ? "Öğrenme oranını, etkin toplu işi, dönem sayısını ve aşırı öğrenme riskini değiştir; eğitim/doğrulama kaybı eğrilerini canlı izle. Bu öğretici model gerçek bir koşunun yerine geçmez."
               : "Change learning rate, batch, epoch, and overfit risk; watch train/val loss curves live. Models exponential decay + overfit rise; does not replace a real run."}
           </p>
         </div>
@@ -313,34 +317,34 @@ export function LossSimulator({ locale }: { locale: Locale }) {
 
       <div className="loss-controls">
         <label className="field">
-          <span>{tr ? "Learning rate" : "Learning rate"}</span>
+          <span>{tr ? "Öğrenme oranı" : "Learning rate"}</span>
           <input type="range" min={0} max={100} value={Math.log10(lr) * 25 + 100} onChange={(e) => setLr(Math.pow(10, (Number(e.target.value) - 100) / 25))} />
           <small>{lr.toExponential(2)}</small>
         </label>
         <label className="field">
-          <span>{tr ? "Effective batch" : "Effective batch"}</span>
+          <span>{tr ? "Etkin toplu iş" : "Effective batch"}</span>
           <input type="range" min={1} max={50} value={Math.log2(batch) * 10} onChange={(e) => setBatch(Math.round(Math.pow(2, Number(e.target.value) / 10)))} />
           <small>{batch}</small>
         </label>
         <label className="field">
-          <span>{tr ? "Epoch" : "Epoch"}</span>
+          <span>{tr ? "Dönem" : "Epoch"}</span>
           <input type="range" min={1} max={8} value={epochs} onChange={(e) => setEpochs(Number(e.target.value))} />
           <small>{epochs}</small>
         </label>
         <label className="field">
-          <span>{tr ? "Overfit riski" : "Overfit risk"}</span>
+          <span>{tr ? "Aşırı öğrenme riski" : "Overfit risk"}</span>
           <input type="range" min={0} max={10} value={overfitRisk * 10} onChange={(e) => setOverfitRisk(Number(e.target.value) / 10)} />
           <small>{(overfitRisk * 100).toFixed(0)}%</small>
         </label>
         <label className="field">
-          <span>{tr ? "Toplam step" : "Total steps"}</span>
-          <input type="range" min={100} max={50} value={steps / 20} onChange={(e) => setSteps(Math.round(Number(e.target.value) * 20))} />
+          <span>{tr ? "Toplam adım" : "Total steps"}</span>
+          <input type="range" min={5} max={50} value={steps / 20} onChange={(e) => setSteps(Math.round(Number(e.target.value) * 20))} />
           <small>{steps}</small>
         </label>
       </div>
 
       <div className="loss-chart">
-        <svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label={tr ? "Loss eğrileri" : "Loss curves"}>
+        <svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label={tr ? "Kayıp eğrileri" : "Loss curves"}>
           {/* Grid */}
           {[0.5, 1.0, 1.5, 2.0, 2.5, 3.0].map((v) => (
             <g key={v}>
@@ -350,28 +354,28 @@ export function LossSimulator({ locale }: { locale: Locale }) {
           ))}
           {/* Best step marker */}
           <line x1={xScale(sim.bestStep)} y1={padY} x2={xScale(sim.bestStep)} y2={h - padY} stroke="var(--green)" strokeWidth={1} strokeDasharray="3 3" />
-          <text x={xScale(sim.bestStep) + 4} y={padY + 12} fontSize="9" fill="var(--green)">↑ {tr ? "en iyi step" : "best step"} ({sim.bestStep})</text>
+          <text x={xScale(sim.bestStep) + 4} y={padY + 12} fontSize="9" fill="var(--green)">{tr ? "en iyi adım" : "best step"} ({sim.bestStep})</text>
           {/* Overfit point */}
           {sim.overfitPoint < steps && (
             <g>
               <line x1={xScale(sim.overfitPoint)} y1={padY} x2={xScale(sim.overfitPoint)} y2={h - padY} stroke="var(--red)" strokeWidth={1} strokeDasharray="3 3" />
-              <text x={xScale(sim.overfitPoint) + 4} y={h - padY - 4} fontSize="9" fill="var(--red)">↑ {tr ? "overfit başlangıcı" : "overfit onset"} ({sim.overfitPoint})</text>
+              <text x={xScale(sim.overfitPoint) + 4} y={h - padY - 4} fontSize="9" fill="var(--red)">{tr ? "aşırı öğrenme başlangıcı" : "overfit onset"} ({sim.overfitPoint})</text>
             </g>
           )}
           {/* Train */}
           <path d={trainPath} fill="none" stroke="var(--blue)" strokeWidth={2} />
           {/* Val */}
           <path d={valPath} fill="none" stroke="var(--orange)" strokeWidth={2} strokeDasharray="4 3" />
-          <text x={w - padX} y={padY + 8} textAnchor="end" fontSize="9" fill="var(--blue)">— {tr ? "train" : "train"}</text>
-          <text x={w - padX} y={padY + 20} textAnchor="end" fontSize="9" fill="var(--orange)">-- {tr ? "val" : "val"}</text>
+          <text x={w - padX} y={padY + 8} textAnchor="end" fontSize="9" fill="var(--blue)">{tr ? "eğitim" : "train"}</text>
+          <text x={w - padX} y={padY + 20} textAnchor="end" fontSize="9" fill="var(--orange)">{tr ? "doğrulama" : "validation"}</text>
         </svg>
       </div>
 
       <div className="loss-metrics">
-        <div><b>{sim.finalTrain.toFixed(3)}</b><span>{tr ? "Son train loss" : "Final train loss"}</span></div>
-        <div><b>{sim.finalVal.toFixed(3)}</b><span>{tr ? "Son val loss" : "Final val loss"}</span></div>
-        <div><b>{sim.bestStep}</b><span>{tr ? "En iyi val step" : "Best val step"}</span></div>
-        <div><b>{sim.overfitPoint < steps ? sim.overfitPoint : "—"}</b><span>{tr ? "Overfit başlangıcı" : "Overfit onset"}</span></div>
+        <div><b>{sim.finalTrain.toFixed(3)}</b><span>{tr ? "Son eğitim kaybı" : "Final train loss"}</span></div>
+        <div><b>{sim.finalVal.toFixed(3)}</b><span>{tr ? "Son doğrulama kaybı" : "Final validation loss"}</span></div>
+        <div><b>{sim.bestStep}</b><span>{tr ? "En iyi doğrulama adımı" : "Best validation step"}</span></div>
+        <div><b>{sim.overfitPoint < steps ? sim.overfitPoint : "—"}</b><span>{tr ? "Aşırı öğrenme başlangıcı" : "Overfit onset"}</span></div>
       </div>
     </article>
   );
@@ -402,10 +406,10 @@ export function AttentionHeatmap({ locale }: { locale: Locale }) {
       <div className="viz-head">
         <span className="lab-index">V04</span>
         <div>
-          <h2>{tr ? "Attention Heatmap" : "Attention Heatmap"}</h2>
+          <h2>{tr ? "Dikkat Isı Haritası" : "Attention Heatmap"}</h2>
           <p className="viz-subtitle">
             {tr
-              ? "Bir cümlede her token'ın diğerlerine ne kadar 'dikkat' ettiğini ısı haritası olarak gösterir. Renk yoğunluğu = attention ağırlığı. Bu görsel bir simülasyondur; gerçek modelin attention'ını yansıtmaz."
+              ? "Bir cümlede her tokenın diğerlerine ne kadar dikkat ettiğini ısı haritası olarak gösterir. Renk yoğunluğu dikkat ağırlığını temsil eder. Bu görsel bir simülasyondur; gerçek modelin dikkat değerlerini yansıtmaz."
               : "Shows how much each token in a sentence 'attends' to every other as a heatmap. Color intensity = attention weight. This is a simulation; it does not reflect a real model's attention."}
           </p>
         </div>
