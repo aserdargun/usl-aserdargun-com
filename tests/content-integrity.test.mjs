@@ -59,3 +59,23 @@ test("new learning controls do not use emoji as interface assets", async () => {
   ]);
   assert.doesNotMatch(sources.join("\n"), /[🌱🎓🔬💡😣👍✨]/u);
 });
+
+test("VRAM estimates account for all layers and FP16 key and value storage", () => {
+  const input = { paramsB: 4, quantizationBits: 4, adapterRank: 8, adapterMatrices: 7, hiddenDim: 4096, contextLength: 2048, microBatch: 1, gradientCheckpointing: false, budget: 16, layers: 32, kvDimension: 1024 };
+  const estimate = vramEstimate(input);
+  assert.equal(estimate.kvCache, 0.25);
+  assert.equal(vramEstimate({ ...input, microBatch: 2 }).kvCache, 0.5);
+  assert.equal(estimate.adapter, Math.round(8 * 4096 * 2 * 7 * 32 * 4 / 1024 ** 3 * 100) / 100);
+  assert.ok(vramEstimate({ ...input, layers: 16 }).activations < estimate.activations);
+});
+
+test("loss simulation is deterministic and stays near its declared starting loss", async () => {
+  const { simulateLoss } = await import("../app/atlas-extras.ts");
+  const input = { baseLoss: 2.5, floor: 0.7, steps: 100, lr: 2e-4, batch: 32, epochs: 3, overfitRisk: 0.5 };
+  const first = simulateLoss(input);
+  assert.deepEqual(first, simulateLoss(input));
+  assert.ok(Math.abs(first.train[0] - input.baseLoss) < 0.01);
+  assert.equal(first.train.length, 100);
+  assert.ok([...first.train, ...first.val].every(Number.isFinite));
+  assert.equal(first.val[first.bestStep], Math.min(...first.val));
+});

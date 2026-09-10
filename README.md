@@ -108,6 +108,10 @@ The Vinext build targets the compatible local/Sites worker runtime. `npm run bui
 
 - Language: `unsloth-atlas-language`
 - Progress: `unsloth-atlas-progress:v1`
+- Flashcard schedule: `unsloth-atlas-flashcards:v1`
+- Theme: `unsloth-atlas-theme`
+
+Stored records are validated before use. Invalid numeric inputs keep the last valid result; corrupt records cannot prevent the app from opening. If browser storage is denied or full, controls remain usable and progress changes show a session-only notice.
 
 There is no account, backend, central database, or live GPU connection in v1.
 
@@ -120,3 +124,7 @@ Target: [usl.aserdargun.com](https://usl.aserdargun.com)
 ## License
 
 Source code: [MIT](LICENSE). Original educational content in this repository: [CC BY 4.0](CONTENT-LICENSE.md).
+
+### Dependency maintenance
+
+The `miniflare > sharp` override pins `sharp` to `0.35.4` to avoid the vulnerable image-processing dependency pinned by Miniflare. Recheck this override when upgrading Miniflare; remove it once the upstream dependency includes the fix. Both the Vinext worker and Azure static export must pass after runtime updates.

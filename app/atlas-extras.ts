@@ -27,50 +27,34 @@ export const tokenizerSamples: Record<Locale, TokenizerSample[]> = {
   tr: [
     {
       id: "tr-daily",
-      tr: { text: "Türkçe, İngilizce tokenizerlarda daha pahalıdır.", note: "Günlük cümle: bağlam+ek yapısı BPE'yi zorlar." },
-      en: { text: "Turkish is more expensive in English tokenizers.", note: "Same meaning in English: fewer tokens in EN-centric tokenizers." },
+      tr: { text: "Aynı metni farklı tokenizerlarla ölçebiliriz.", note: "Günlük cümle: parçaları iki dilde karşılaştır." },
+      en: { text: "We can measure the same text with different tokenizers.", note: "Compare the same meaning with a toy splitting rule." },
       splitRule: "word-subword",
-      charCount: { tr: 50, en: 47 },
+      charCount: { tr: 0, en: 0 },
     },
     {
       id: "tr-compound",
-      tr: { text: "Üniversite öğrencileri için kalıcı bilgi.", note: "Bileşik isim: tek kelime gibi ama BPE'de 2-3 parçaya bölünür." },
-      en: { text: "Durable knowledge for university students.", note: "English compounds are rare; mostly single tokens." },
+      tr: { text: "Üniversite öğrencileri için kalıcı bilgi.", note: "İsim grubu: bu oyuncak kuralda uzun sözcükler bölünür." },
+      en: { text: "Durable knowledge for university students.", note: "Compare an English noun phrase with its Turkish counterpart." },
       splitRule: "word-subword",
-      charCount: { tr: 45, en: 47 },
+      charCount: { tr: 0, en: 0 },
     },
     {
       id: "tr-agglutination",
-      tr: { text: "Eğitimlerini tamamlamadıkları için belgelendirilemediler.", note: "Ek yığılması (agglutination): tek kelime BPE'yi parçalar." },
-      en: { text: "They could not be certified because they did not finish.", note: "English keeps word count low with auxiliaries." },
+      tr: { text: "Eğitimlerini tamamlamadıkları için belgelendirilemediler.", note: "Eklemeli yapı: gerçek token sınırları tokenizer sözlüğüne bağlıdır." },
+      en: { text: "They could not be certified because they did not finish.", note: "An English phrase corresponding to Turkish suffixes." },
       splitRule: "word-subword",
-      charCount: { tr: 53, en: 57 },
+      charCount: { tr: 0, en: 0 },
     },
   ],
-  en: [
-    {
-      id: "en-daily",
-      en: { text: "Turkish is more expensive in English tokenizers.", note: "Same meaning in English: fewer tokens in EN-centric tokenizers." },
-      tr: { text: "Türkçe, İngilizce tokenizerlarda daha pahalıdır.", note: "Daily sentence: agglutinative structure stresses BPE." },
-      splitRule: "word-subword",
-      charCount: { en: 47, tr: 50 },
-    },
-    {
-      id: "en-compound",
-      en: { text: "Durable knowledge for university students.", note: "English compounds are rare; mostly single tokens." },
-      tr: { text: "Üniversite öğrencileri için kalıcı bilgi.", note: "Compound noun: looks like one word but BPE splits 2-3." },
-      splitRule: "word-subword",
-      charCount: { en: 47, tr: 45 },
-    },
-    {
-      id: "en-agglutination",
-      en: { text: "They could not be certified because they did not finish.", note: "English keeps word count low with auxiliaries." },
-      tr: { text: "Eğitimlerini tamamlamadıkları için belgelendirilemediler.", note: "Suffix stacking: one word, many BPE pieces." },
-      splitRule: "word-subword",
-      charCount: { en: 57, tr: 53 },
-    },
-  ],
+  en: [],
 };
+
+// Keep the paired data and derived character counts identical in either UI language.
+for (const sample of tokenizerSamples.tr) {
+  sample.charCount = { tr: Array.from(sample.tr.text).length, en: Array.from(sample.en.text).length };
+}
+tokenizerSamples.en = tokenizerSamples.tr.map((sample) => ({ ...sample, id: sample.id.replace(/^tr-/, "en-") }));
 
 // BPE-benzeri parçalama: önce boşlukla böl, sonra uzun parçaları
 // alt-sözcüklere ayır. Akademik değil; yalnızca "yaklaşık gösterim".
@@ -459,7 +443,9 @@ export interface VramInput {
   paramsB: number;      // milyar parametre (örn. 4)
   quantizationBits: 4 | 8 | 16; // base quantization
   adapterRank: number;
-  adapterMatrices: number;
+  adapterMatrices: number; // target matrices per layer, simplified as square
+  layers?: number; // teaching default: 32
+  kvDimension?: number; // num_key_value_heads * head_dim; default hiddenDim / 4
   hiddenDim: number;
   contextLength: number;
   microBatch: number;
@@ -468,12 +454,14 @@ export interface VramInput {
 }
 
 export function vramEstimate(input: VramInput): VramEstimate {
+  const layers = input.layers ?? 32;
+  const kvDimension = input.kvDimension ?? input.hiddenDim / 4;
   const bytesPerParam = input.quantizationBits / 8;
   const totalParams = input.paramsB * 1e9;
   const weights = (totalParams * bytesPerParam) / (1024 ** 3);
 
   // Adapter: rank × hidden × 2 (A+B) × matrices. Float32 eğitim.
-  const adapterParams = input.adapterRank * input.hiddenDim * 2 * input.adapterMatrices;
+  const adapterParams = input.adapterRank * input.hiddenDim * 2 * input.adapterMatrices * layers;
   const adapter = (adapterParams * 4) / (1024 ** 3);
 
   // Optimizer (Adam): momentum + variance = 8 bytes per trainable parameter (fp32)
@@ -485,14 +473,13 @@ export function vramEstimate(input: VramInput): VramEstimate {
 
   // Aktivasyon: yaklaşık olarak batch × seq × hidden × 4 byte × 2 (fwd+bwd)
   // Gradient checkpointing için öğretici bir bellek azaltma katsayısı.
-  const actBytes = input.microBatch * input.contextLength * input.hiddenDim * 4 * 2;
+  const actBytes = input.microBatch * input.contextLength * input.hiddenDim * 4 * 2 * layers;
   const ckptFactor = input.gradientCheckpointing ? 0.55 : 1;
   const activations = (actBytes * ckptFactor) / (1024 ** 3);
 
-  // KV cache (inference): 2 × layers × seq × heads × head_dim × 2 byte (fp16)
-  // LLaMA-3 8B için yaklaşık 32 layer, 32 head, 128 head_dim. Biz oran kullanıyoruz:
-  // ~ paramsB * 0.5 MB per token (heuristic)
-  const kvCache = (input.contextLength * input.paramsB * 0.0005) / 1024;
+  // FP16 key + value tensors across batch, layers, sequence and KV width.
+  // The default GQA width is an explicit teaching assumption, not a model spec.
+  const kvCache = (2 * input.microBatch * layers * input.contextLength * kvDimension * 2) / (1024 ** 3);
 
   const total = weights + adapter + optimizer + gradients + activations;
   return {
@@ -548,7 +535,7 @@ export function simulateLoss(input: LossInput): LossSimulation {
   // Effective learning rate: büyük batch daha büyük lr tolere eder.
   // Burada oranı normalize ediyoruz.
   const lrFactor = Math.min(1.5, Math.max(0.4, lr / 2e-4));
-  const batchFactor = Math.min(1.4, Math.max(0.7, 32 / batch));
+  const batchFactor = Math.min(1.4, Math.max(0.7, batch / 32));
 
   // Half-life: step sayısı. Yüksek lr → hızlı düşüş. Batch büyüdükçe
   // effective update seyrekleşir, yarı-ömür hafifçe uzar.
@@ -564,18 +551,18 @@ export function simulateLoss(input: LossInput): LossSimulation {
   for (let s = 0; s < steps; s++) {
     xs.push(s);
     // train loss: üstel bozunma
-    const t = baseLoss * Math.exp(-decayRate * s) + floor;
-    // hafif noise (sadece görsel, sabit seed yok; Math.random deterministic değil ama UI için yeterli)
+    const t = (baseLoss - floor) * Math.exp(-decayRate * s) + floor;
+    // Deterministic visual noise: the same inputs produce the same curve.
     const noise = (Math.sin(s * 0.7) + Math.cos(s * 0.3)) * 0.005 * lrFactor;
     train.push(t + noise);
 
     // val loss: önce düşer, sonra yükselir
     let v: number;
     if (s < valValleyStep) {
-      v = baseLoss * Math.exp(-decayRate * s * 0.9) + floor + 0.05;
+      v = (baseLoss - floor) * Math.exp(-decayRate * s * 0.9) + floor + 0.05;
     } else {
       const over = (s - valValleyStep) * overfitRate;
-      v = baseLoss * Math.exp(-decayRate * valValleyStep * 0.9) + floor + 0.05 + over;
+      v = (baseLoss - floor) * Math.exp(-decayRate * valValleyStep * 0.9) + floor + 0.05 + over;
     }
     val.push(v);
   }

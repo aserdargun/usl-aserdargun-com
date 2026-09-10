@@ -14,3 +14,11 @@ The application deliberately avoids presenting a planning calculator as a real t
 | Unsloth release status used during this review | [Unsloth v0.1.806-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.806-beta), published 2026-09-02, enables multi-token prediction by default for the named supported models. This is release context only; the atlas does not generalize its speed claim to every model or workload. |
 
 Reverification rule: whenever the Turkish source digest changes or a version-sensitive product claim changes, update this date, re-check first-party documentation, and keep `content/locale-parity.json.stale` empty before release.
+
+## Calculator review — 2026-09-10
+
+Teaching-model behavior version: **2** (VRAM layer/KV accounting, deterministic loss baseline and total-preserving dataset allocation). Flashcard scheduling behavior version: **2** (due-card order and completed-deck handling). Stored progress and flashcard record schemas remain v1 because the serialized fields remain compatible.
+
+- The VRAM teaching model now counts all 32 assumed layers for adapters and activations. Seven square target matrices per layer and a KV width of one quarter of hidden width are explicitly displayed assumptions, not specifications for the model sizes in the selector. Quantization metadata, runtime workspaces and allocator overhead remain excluded; being below budget does not establish hardware fit.
+- FP16 KV storage uses `2 * batch * layers * sequence * KV width * 2 bytes / 1024^3`. [Transformers cache documentation](https://huggingface.co/docs/transformers/kv_cache) describes per-layer key/value storage and architecture-dependent caching behavior. [PEFT LoRA documentation](https://huggingface.co/docs/peft/main/package_reference/lora) distinguishes rank, target modules and selected layers. These sources support the structure, not the illustrative architecture defaults.
+- Tokenizer comparisons use paired translations and a toy splitting rule. The ratio is not a measurement of token efficiency or inference cost. Loss curves remain deterministic illustrations, and the chart scales to show the full curve.

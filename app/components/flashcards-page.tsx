@@ -2,42 +2,16 @@
 
 // Spaced Repetition Flashcards sayfası.
 // 5-kutu SRS: 1, 3, 7, 14, 30 gün. "Zor" → kutu azalır, "kolay" → kutu artar.
-// localStorage'da durum saklanır. "Benim ilerlemem" ile entegre.
+// Kart tekrarları, ders/hafta ilerlemesinden ayrı bir tarayıcı kaydında tutulur.
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "../atlas-data";
 import { flashcards, srsBoxes } from "../atlas-extras";
 
-interface FlashcardState {
-  box: number;       // 0=yeni, 1-4=kutu numarası
-  nextReview: number; // timestamp (ms)
-  seenCount: number;
-  correctCount: number;
-}
-
-type FlashcardProgress = Record<string, FlashcardState>;
+import { parseFlashcards, readStorage, writeStorage, type FlashcardProgress, type FlashcardState } from "@/lib/learning-state";
 
 const STORAGE_KEY = "unsloth-atlas-flashcards:v1";
-
-function emptyState(): FlashcardProgress {
-  return {};
-}
-
-function loadFromStorage(): FlashcardProgress {
-  if (typeof window === "undefined") return emptyState();
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return emptyState();
-    return JSON.parse(raw) as FlashcardProgress;
-  } catch {
-    return emptyState();
-  }
-}
-
-function saveToStorage(state: FlashcardProgress): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
+const emptyState = (): FlashcardProgress => ({});
 
 function dueCards(cards: { id: string }[], progress: FlashcardProgress, now: number) {
   return cards.filter((c) => {
@@ -52,22 +26,35 @@ export function FlashcardsPage({ locale }: { locale: Locale }) {
   const cards = flashcards[locale];
   const [progress, setProgress] = useState<FlashcardProgress>(emptyState);
   const [now, setNow] = useState<number>(0);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [flipped, setFlipped] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [storageUnavailable, setStorageUnavailable] = useState(false);
 
   // Hydration sonrası yükle (AtlasApp ile aynı pattern — setTimeout ile
   // cascading render uyarısından kaçınılır)
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      setProgress(loadFromStorage());
+      setProgress(parseFlashcards(readStorage(STORAGE_KEY), cards.map((card) => card.id), srsBoxes.length));
       setNow(Date.now());
     }, 0);
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [cards]);
+
+  useEffect(() => {
+    const refresh = () => setNow(Date.now());
+    const future = Object.values(progress).map((p) => p.nextReview).filter((at) => at > now);
+    const timer = future.length ? window.setTimeout(refresh, Math.min(2_147_483_647, Math.max(1, Math.min(...future) - Date.now()))) : undefined;
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [progress, now]);
 
   const due = useMemo(() => dueCards(cards, progress, now), [cards, progress, now]);
-  const queue = due.length > 0 ? due : cards.slice(0, 1);
-  const current = queue[activeIndex] ?? queue[0];
+  const current = due[0];
   const card = current ? cards.find((c) => c.id === current.id) : null;
 
   // İstatistikler
@@ -80,7 +67,7 @@ export function FlashcardsPage({ locale }: { locale: Locale }) {
   }, [progress, cards, due]);
 
   function answer(level: "hard" | "good" | "easy") {
-    if (!current) return;
+    if (!current || !flipped) return;
     const p = progress[current.id] ?? { box: 0, nextReview: 0, seenCount: 0, correctCount: 0 };
     let nextBox = p.box;
     if (level === "hard") nextBox = Math.max(0, p.box - 1);
@@ -96,21 +83,17 @@ export function FlashcardsPage({ locale }: { locale: Locale }) {
     };
     const next_ = { ...progress, [current.id]: next };
     setProgress(next_);
-    saveToStorage(next_);
+    setStorageUnavailable(!writeStorage(STORAGE_KEY, JSON.stringify(next_)));
 
     setFlipped(false);
-    if (activeIndex + 1 < queue.length) {
-      setActiveIndex(activeIndex + 1);
-    } else {
-      setActiveIndex(0);
-      setNow(Date.now());
-    }
+    cardRef.current?.focus();
+    setNow(Date.now());
   }
 
   function reset() {
     setProgress(emptyState());
-    saveToStorage(emptyState());
-    setActiveIndex(0);
+    setStorageUnavailable(!writeStorage(STORAGE_KEY, "{}"));
+    setNow(Date.now());
     setFlipped(false);
   }
 
@@ -127,17 +110,20 @@ export function FlashcardsPage({ locale }: { locale: Locale }) {
         <EvidencePillTr level="simulation" tr={tr} />
       </div>
 
+      {storageUnavailable && <p className="warning" role="status">{tr ? "Tarayıcı kaydı kullanılamıyor. Kart ilerlemen yalnızca bu sayfa açıkken korunur." : "Browser storage is unavailable. Card progress lasts only while this page stays open."}</p>}
       <div className="flash-stats">
         <div><b>{stats.seen}/{stats.total}</b><span>{tr ? "görülen kart" : "seen cards"}</span></div>
         <div><b>{stats.due}</b><span>{tr ? "tekrar zamanı gelen" : "due now"}</span></div>
-        <div><b>%{stats.accuracy}</b><span>{tr ? "isabet" : "accuracy"}</span></div>
+        <div><b>{tr ? `%${stats.accuracy}` : `${stats.accuracy}%`}</b><span>{tr ? "isabet" : "accuracy"}</span></div>
         <button className="reset-button" onClick={reset}>{tr ? "Sıfırla" : "Reset"}</button>
       </div>
 
       {card ? (
         <div
+          ref={cardRef}
           className={`flash-card ${flipped ? "flipped" : ""}`}
           role="button"
+          aria-pressed={flipped}
           tabIndex={0}
           onClick={() => setFlipped(!flipped)}
           onKeyDown={(event) => {
@@ -148,12 +134,12 @@ export function FlashcardsPage({ locale }: { locale: Locale }) {
           }}
         >
           <div className="flash-card-inner">
-            <div className="flash-card-face flash-card-front">
+            <div className="flash-card-face flash-card-front" aria-hidden={flipped}>
               <span className="kicker">{tr ? "ÖN YÜZ" : "FRONT"}</span>
               <p>{card[locale].front}</p>
               <small>{tr ? "Cevabı görmek için tıkla" : "Click to reveal"}</small>
             </div>
-            <div className="flash-card-face flash-card-back">
+            <div className="flash-card-face flash-card-back" aria-hidden={!flipped}>
               <span className="kicker">{tr ? "ARKA YÜZ" : "BACK"}</span>
               <p>{card[locale].back}</p>
               {card[locale].hint && <small>{tr ? "İpucu: " : "Hint: "}{card[locale].hint}</small>}
@@ -161,8 +147,8 @@ export function FlashcardsPage({ locale }: { locale: Locale }) {
           </div>
         </div>
       ) : (
-        <article className="flash-card flash-card-empty">
-          <p>{tr ? "Şu an görülecek kart yok. Yarın tekrar gel." : "No cards due. Come back tomorrow."}</p>
+        <article className="flash-card flash-card-empty" role="status">
+          <p>{tr ? "Bugünkü tekrarlar tamamlandı. Kartlar tekrar zamanı geldiğinde burada görünecek." : "Today’s reviews are complete. Cards will appear here when their next review is due."}</p>
         </article>
       )}
 
@@ -170,7 +156,7 @@ export function FlashcardsPage({ locale }: { locale: Locale }) {
         <div className="flash-actions">
           <button onClick={() => answer("hard")} className="flash-btn flash-btn-hard">
             <b>{tr ? "Zor" : "Hard"}</b>
-            <span>{tr ? "1 gün sonra" : "in 1 day"}</span>
+            <span>{tr ? `${srsBoxes[Math.max(0, (progress[card.id]?.box ?? 0) - 1)]} gün sonra` : `in ${srsBoxes[Math.max(0, (progress[card.id]?.box ?? 0) - 1)]} days`}</span>
           </button>
           <button onClick={() => answer("good")} className="flash-btn flash-btn-good">
             <b>{tr ? "İyi" : "Good"}</b>

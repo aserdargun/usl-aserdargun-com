@@ -3,7 +3,7 @@
 // Kalıcı bilgi katmanı: Concept Depth ve Prerequisite Graph bileşenleri.
 // Her ders sayfasında gömülü olarak görünür.
 
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import Link from "next/link";
 import type { Locale } from "../atlas-data";
 import { conceptDepth, prerequisites, type DepthLevel } from "../atlas-extras";
@@ -45,6 +45,8 @@ const order: DepthLevel[] = ["layman", "undergrad", "advanced"];
 export function ConceptDepth({ locale, lessonId }: { locale: Locale; lessonId: string }) {
   const tr = locale === "tr";
   const data = conceptDepth[lessonId]?.[locale];
+  const tabId = useId();
+  const tabs = useRef<Array<HTMLButtonElement | null>>([]);
   const [active, setActive] = useState<DepthLevel>("undergrad");
 
   if (!data) return null;
@@ -60,13 +62,24 @@ export function ConceptDepth({ locale, lessonId }: { locale: Locale; lessonId: s
         </p>
       </div>
 
-      <div className="concept-depth-tabs" role="tablist">
-        {order.map((level) => {
+      <div className="concept-depth-tabs" role="tablist" aria-label={tr ? "Kavram derinliği" : "Concept depth"}>
+        {order.map((level, index) => {
           const meta = levelMeta[level];
           return (
             <button
               key={level}
               role="tab"
+              id={`${tabId}-${level}`}
+              aria-controls={`${tabId}-panel`}
+              tabIndex={active === level ? 0 : -1}
+              ref={(node) => { tabs.current[index] = node; }}
+              onKeyDown={(event) => {
+                const next = event.key === "ArrowRight" ? (index + 1) % order.length : event.key === "ArrowLeft" ? (index + order.length - 1) % order.length : event.key === "Home" ? 0 : event.key === "End" ? order.length - 1 : null;
+                if (next === null) return;
+                event.preventDefault();
+                setActive(order[next]);
+                tabs.current[next]?.focus();
+              }}
               aria-selected={active === level}
               className={`concept-depth-tab ${active === level ? "active" : ""}`}
               onClick={() => setActive(level)}
@@ -79,7 +92,7 @@ export function ConceptDepth({ locale, lessonId }: { locale: Locale; lessonId: s
         })}
       </div>
 
-      <article className={`concept-depth-content concept-depth-${active}`} role="tabpanel">
+      <article className={`concept-depth-content concept-depth-${active}`} role="tabpanel" id={`${tabId}-panel`} aria-labelledby={`${tabId}-${active}`} tabIndex={0}>
         <span className="kicker">{tr ? levelMeta[active].tr : levelMeta[active].en}</span>
         <p>{data[active][locale]}</p>
       </article>

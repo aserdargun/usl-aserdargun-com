@@ -21,6 +21,7 @@
   --green: #16a34a;
   --aqua: #0d9488;
   --blue: #2563eb;
+  --chart-accent: #b45309;
   --red: #dc2626;
   --on-accent: #ffffff;
   --on-highlight: #1c1917;
@@ -40,6 +41,7 @@
   --green: #4ade80;
   --aqua: #2dd4bf;
   --blue: #60a5fa;
+  --chart-accent: #fb923c;
   --red: #f87171;
   --on-accent: #0b1220;
   --on-highlight: #1c1917;
@@ -89,7 +91,7 @@ button { color: inherit; }
 .brand b { display: block; font-size: .88rem; line-height: 1.1; }
 .brand small { color: var(--muted); font-size: .68rem; }
 .site-header nav { display: flex; align-items: center; justify-content: center; gap: clamp(.75rem, 2vw, 1.8rem); min-width: 0; }
-.site-header nav a { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: .65rem 0; font-size: .76rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.site-header nav a { flex: 0 0 auto; position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: .65rem 0; font-size: .76rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
 .site-header nav a:hover, .site-header nav a:focus-visible, .site-header nav a.active { color: var(--text); }
 .site-header nav a.active::after { content: ""; position: absolute; height: 2px; left: 0; right: 0; bottom: .3rem; background: var(--orange); border-radius: 2px; }
 .header-actions { display: flex; align-items: center; gap: .55rem; }
@@ -302,7 +304,7 @@ footer a:hover { color: var(--orange); }
 .gateway-actions a { padding: .8rem 1.2rem; background: var(--orange); color: var(--on-accent); font-weight: 800; border-radius: .5rem; }
 
 /* Responsive --------------------------------------------------------------- */
-@media (max-width: 1120px) {
+@media (max-width: 1380px) {
   .site-header { grid-template-columns: 1fr auto; }
   .site-header nav { grid-column: 1 / -1; justify-content: flex-start; overflow-x: auto; order: 3; padding-bottom: .2rem; scrollbar-width: none; }
   .site-header nav::-webkit-scrollbar { display: none; }
@@ -526,7 +528,7 @@ footer a:hover { color: var(--orange); }
 .concept-group-core { background: color-mix(in srgb, var(--orange) 10%, var(--surface)); }
 .concept-group-guard { background: color-mix(in srgb, var(--blue) 10%, var(--surface)); }
 .node-dot { color: var(--orange); line-height: 1.5; }
-@media (max-width: 1120px) { .concept-map-grid { grid-template-columns: 1fr; } }
+@media (max-width: 1380px) { .concept-map-grid { grid-template-columns: 1fr; } }
 /* ========================================================================
    Yeni görsel / interaktif / kalıcı bilgi katmanı
    6 modül: Tokenizer Playground, VRAM Visualizer, Loss Simulator,
@@ -728,9 +730,9 @@ footer a:hover { color: var(--orange); }
 }
 .flash-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 .flash-card-empty { display: flex; align-items: center; justify-content: center; min-height: 160px; padding: 1.5rem; text-align: center; }
-.flash-card-inner { position: relative; width: 100%; min-height: 220px; transition: transform .55s; transform-style: preserve-3d; }
+.flash-card-inner { display: grid; position: relative; width: 100%; min-height: 220px; transition: transform .55s; transform-style: preserve-3d; }
 .flash-card.flipped .flash-card-inner { transform: rotateY(180deg); }
-.flash-card-face { position: absolute; inset: 0; display: flex; flex-direction: column; gap: .6rem; padding: 1.8rem 2rem; backface-visibility: hidden; }
+.flash-card-face { position: relative; grid-area: 1 / 1; min-width: 0; display: flex; flex-direction: column; gap: .6rem; padding: 1.8rem 2rem; backface-visibility: hidden; }
 .flash-card-front { justify-content: center; align-items: flex-start; }
 .flash-card-back { transform: rotateY(180deg); background: color-mix(in srgb, var(--yellow) 18%, var(--bg)); border-radius: 1rem; }
 .flash-card-face p { margin: 0; font-size: 1.2rem; line-height: 1.6; color: var(--text); }
@@ -794,3 +796,6 @@ footer a:hover { color: var(--orange); }
 .field-check { flex-direction: row; align-items: center; gap: .5rem; }
 .field-check input { accent-color: var(--orange); width: 1.1rem; height: 1.1rem; }
 .field-check span { color: var(--text); }
+
+.field input[aria-invalid="true"] { border-color: var(--red); }
+.field input[aria-invalid="true"] + small { color: var(--red); overflow-wrap: anywhere; }

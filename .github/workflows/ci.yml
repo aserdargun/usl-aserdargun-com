@@ -29,3 +29,5 @@ jobs:
       - run: npm run build:azure
         env:
           NEXT_PUBLIC_COMMIT_SHA: ${{ github.sha }}
+      - run: npm run test:static-rendered
+      - run: node --test tests/deployment-workflow.test.mjs

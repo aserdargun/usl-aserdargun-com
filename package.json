@@ -13,43 +13,48 @@
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "content:sync": "node scripts/sync-content.mjs",
     "validate:content": "node scripts/validate-content.mjs",
-    "test:unit": "node --experimental-strip-types --test tests/calculators.test.mjs tests/content.test.mjs tests/content-integrity.test.mjs",
+    "test:unit": "node --experimental-strip-types --test tests/calculators.test.mjs tests/content.test.mjs tests/content-integrity.test.mjs tests/learning-state.test.mjs",
     "test:rendered": "node --test tests/rendered-html.test.mjs",
     "test:static-rendered": "node --test tests/static-export-html.test.mjs",
     "test:codex": "node --test tests/codex-environment.test.mjs tests/deployment-workflow.test.mjs",
     "test": "npm run test:unit && npm run build && npm run test:rendered && npm run build:azure && npm run test:static-rendered",
     "validate:codex": "npm run stop:codex && npm run lint && npm run typecheck && npm test && npm run test:codex && git diff --check",
     "stop:codex": "node scripts/stop-dev.mjs",
-    "typecheck": "tsc --noEmit -p tsconfig.azure.json",
+    "typecheck": "next typegen && tsc --noEmit -p tsconfig.azure.json",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {
-    "next": "16.3.0",
-    "react": "19.2.6",
-    "react-dom": "19.2.6"
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.37.1",
+    "@cloudflare/vite-plugin": "1.54.6",
     "@eslint/js": "9.39.4",
-    "@next/eslint-plugin-next": "16.2.6",
+    "@next/eslint-plugin-next": "16.3.4",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",
-    "@vitejs/plugin-rsc": "0.5.26",
+    "@vitejs/plugin-rsc": "0.5.34",
     "eslint": "9.39.4",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "16.4.0",
-    "react-server-dom-webpack": "19.2.6",
+    "react-server-dom-webpack": "19.2.8",
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
     "typescript-eslint": "8.59.3",
-    "vinext": "1.0.0-beta.2",
-    "vite": "8.0.13",
-    "wrangler": "4.92.0"
+    "vinext": "1.0.0-beta.9",
+    "vite": "8.3.0",
+    "wrangler": "4.130.0"
   },
-  "type": "module"
+  "type": "module",
+  "overrides": {
+    "miniflare": {
+      "sharp": "0.35.4"
+    }
+  }
 }

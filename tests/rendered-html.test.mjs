@@ -45,7 +45,7 @@ test("renders labs, evidence, lessons, and localized metadata", async () => {
   assert.match(labsHtml, /Bağlam bütçesi/);
   assert.match(labsHtml, /Simülasyon/);
   assert.match(evidenceHtml, /İşlem hattı geçti\. Kalite kazanımı kanıtlanmadı\./);
-  assert.match(evidenceHtml, /en iyi değer değil/);
+  assert.match(evidenceHtml, /en yüksek kullanım değil/);
   assert.doesNotMatch(`${labsHtml}\n${evidenceHtml}`, /Context bütçesi|Maximum|Pipeline geçti|peak değil/);
   assert.match(lessonHtml, /Base, Instruct, and Reasoning/);
   assert.match(lessonHtml, /First thought/);

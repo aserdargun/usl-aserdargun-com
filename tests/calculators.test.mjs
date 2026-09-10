@@ -32,3 +32,20 @@ test("dataset mix reports invalid totals and rounded counts", () => {
   assert.equal(valid.counts.missing, 300);
   assert.equal(datasetMix(100, { a: 60, b: 30 }).valid, false);
 });
+
+test("calculator boundaries reject zero divisors, negatives, fractions, and non-finite inputs", () => {
+  for (const rank of [0, -1, NaN, Infinity, 1.5]) assert.throws(() => loraScale(rank, 8), RangeError);
+  for (const microBatch of [0, -1, NaN, Infinity, 1.5]) assert.throws(() => batchMetrics({ datasetSize: 10, microBatch, accumulation: 1 }), RangeError);
+  assert.throws(() => contextBudget({ maximum: 100, input: -1 }), RangeError);
+  assert.throws(() => weightedBenchmark({ domain: 101, format: 0, safety: 0, uncertainty: 0, retention: 0 }), RangeError);
+  assert.throws(() => datasetMix(10, { a: -20, b: 120 }), RangeError);
+});
+
+test("valid dataset allocations conserve the total, including small and uneven datasets", () => {
+  assert.deepEqual(datasetMix(1, { a: 50, b: 50 }).counts, { a: 1, b: 0 });
+  for (const total of [0, 1, 3, 7, 11, 101, 2000]) {
+    const { counts } = datasetMix(total, { a: 55, b: 10, c: 15, d: 10, e: 10 });
+    assert.equal(Object.values(counts).reduce((a, b) => a + b, 0), total);
+    assert.ok(Object.values(counts).every((count) => Number.isInteger(count) && count >= 0));
+  }
+});

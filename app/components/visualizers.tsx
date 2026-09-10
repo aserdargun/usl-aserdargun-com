@@ -6,6 +6,7 @@
 // "simulation" olan öğretici araçlardır.
 
 import { useMemo, useState } from "react";
+import { NumericField } from "./numeric-field";
 import type { Locale } from "../atlas-data";
 import {
   pseudoBpeSplit,
@@ -28,8 +29,7 @@ export function TokenizerPlayground({ locale }: { locale: Locale }) {
   const samples = tokenizerSamples[locale];
   const [activeId, setActiveId] = useState(samples[0]?.id ?? "");
   const sample = samples.find((item) => item.id === activeId) ?? samples[0];
-  const otherLocale: Locale = locale === "tr" ? "en" : "tr";
-  const otherSample = tokenizerSamples[otherLocale].find((item) => item.id === activeId) ?? tokenizerSamples[otherLocale][0];
+  const otherSample = sample;
 
   if (!sample || !otherSample) return null;
 
@@ -56,6 +56,7 @@ export function TokenizerPlayground({ locale }: { locale: Locale }) {
           <button
             key={item.id}
             className={`tokenizer-sample-chip ${item.id === activeId ? "active" : ""}`}
+            aria-pressed={item.id === activeId}
             onClick={() => setActiveId(item.id)}
             type="button"
           >
@@ -75,7 +76,7 @@ export function TokenizerPlayground({ locale }: { locale: Locale }) {
             <span className="kicker">{tr ? "TÜRKÇE" : "TURKISH"}</span>
             <b>{trTokens.length} {tr ? "token" : "tokens"}</b>
           </div>
-          <p className="tokenizer-raw">{sample[locale].text}</p>
+          <p className="tokenizer-raw">{sample.tr.text}</p>
           <div className="tokenizer-tokens">
             {trTokens.map((token, i) => (
               <span key={i} className={`tokenizer-token ${token.endsWith("##") ? "subword" : "word"}`}>
@@ -107,8 +108,8 @@ export function TokenizerPlayground({ locale }: { locale: Locale }) {
         <b>{tr ? "Karşılaştırma" : "Comparison"}</b>
         <span>
           {tr
-            ? `Türkçe metin, İngilizce karşılığına göre yaklaşık ${ratio.toFixed(2)}× daha fazla token üretiyor. Bu, bağlam penceresini ve çıkarım maliyetini doğrudan etkiler.`
-            : `Turkish produces about ${ratio.toFixed(2)}× more tokens than its English counterpart. This directly affects the context window and inference cost.`}
+            ? `Bu oyuncak bölme kuralında Türkçe/İngilizce parça sayısı oranı ${ratio.toFixed(2)}×. Bu oran gerçek tokenizer verimliliğini veya çıkarım maliyetini ölçmez.`
+            : `With this toy splitting rule, the Turkish/English piece-count ratio is ${ratio.toFixed(2)}×. This ratio does not measure real tokenizer efficiency or inference cost.`}
         </span>
       </div>
     </article>
@@ -134,7 +135,8 @@ export function VRAMVisualizer({ locale }: { locale: Locale }) {
     paramsB,
     quantizationBits,
     adapterRank,
-    adapterMatrices: 7, // LLaMA/Qwen tipik: q, k, v, o, gate, up, down
+    adapterMatrices: 7, // Simplified square target matrices per layer.
+    layers: 32,
     hiddenDim: paramsB <= 4 ? 2560 : paramsB <= 9 ? 4096 : 5120,
     contextLength,
     microBatch,
@@ -144,7 +146,7 @@ export function VRAMVisualizer({ locale }: { locale: Locale }) {
 
   const segments = [
     { key: "weights", label: tr ? "Model ağırlıkları" : "Model weights", value: estimate.weights, color: "var(--blue)" },
-    { key: "adapter", label: tr ? "Adaptör" : "Adapter", value: estimate.adapter, color: "var(--orange)" },
+    { key: "adapter", label: tr ? "Adaptör" : "Adapter", value: estimate.adapter, color: "var(--chart-accent)" },
     { key: "optimizer", label: tr ? "İyileştirici" : "Optimizer", value: estimate.optimizer, color: "var(--yellow)" },
     { key: "gradients", label: tr ? "Gradyanlar" : "Gradients", value: estimate.gradients, color: "var(--green)" },
     { key: "activations", label: tr ? "Aktivasyonlar" : "Activations", value: estimate.activations, color: "var(--red)" },
@@ -169,6 +171,9 @@ export function VRAMVisualizer({ locale }: { locale: Locale }) {
         </div>
       </div>
 
+      <p className="warning">{tr
+        ? "Varsayım: 32 katman; katman başına 7 kare LoRA matrisi; KV boyutu gizli boyutun dörtte biri; FP16 KV, FP32 adaptör ve Adam durumları. Gerçek mimari, niceleme ek yükü, çalışma alanları ve bellek ayırıcısı dahil değildir. Bu bir eğitim modeli; sığma garantisi vermez."
+        : "Assumptions: 32 layers; 7 square LoRA matrices per layer; KV width is one quarter of hidden width; FP16 KV, FP32 adapters and Adam states. Actual architecture, quantization overhead, workspaces, and allocator overhead are excluded. This teaching model cannot guarantee fit."}</p>
       <div className="vram-grid">
         <div className="vram-controls">
           <label className="field">
@@ -189,18 +194,9 @@ export function VRAMVisualizer({ locale }: { locale: Locale }) {
               <option value={16}>FP16</option>
             </select>
           </label>
-          <label className="field">
-            <span>{tr ? "LoRA rankı" : "LoRA rank"}</span>
-            <input type="number" min={1} max={256} value={adapterRank} onChange={(e) => setAdapterRank(Number(e.target.value))} />
-          </label>
-          <label className="field">
-            <span>{tr ? "Bağlam uzunluğu" : "Context length"}</span>
-            <input type="number" min={256} max={32768} step={256} value={contextLength} onChange={(e) => setContextLength(Number(e.target.value))} />
-          </label>
-          <label className="field">
-            <span>{tr ? "Mikro toplu iş" : "Micro batch"}</span>
-            <input type="number" min={1} max={8} value={microBatch} onChange={(e) => setMicroBatch(Number(e.target.value))} />
-          </label>
+          <NumericField locale={locale} label={tr ? "LoRA rankı" : "LoRA rank"} value={adapterRank} onChange={setAdapterRank} min={1} max={256} step={1} />
+          <NumericField locale={locale} label={tr ? "Bağlam uzunluğu" : "Context length"} value={contextLength} onChange={setContextLength} min={256} max={32768} step={256} />
+          <NumericField locale={locale} label={tr ? "Mikro toplu iş" : "Micro batch"} value={microBatch} onChange={setMicroBatch} min={1} max={8} step={1} />
           <label className="field field-check">
             <input type="checkbox" checked={gradientCheckpointing} onChange={(e) => setGradientCheckpointing(e.target.checked)} />
             <span>{tr ? "Gradyan denetim noktaları" : "Gradient checkpointing"}</span>
@@ -239,6 +235,7 @@ export function VRAMVisualizer({ locale }: { locale: Locale }) {
                 />
               );
             })}
+            <circle cx={cx} cy={cy} r={29} fill="var(--surface)" />
             <text x={cx} y={cy - 6} textAnchor="middle" fill="var(--text)" fontSize="11" fontWeight="bold">{estimate.total.toFixed(1)}</text>
             <text x={cx} y={cy + 8} textAnchor="middle" fill="var(--muted)" fontSize="9">GiB {tr ? "tahmini" : "estimate"}</text>
             <text x={cx} y={cy + 22} textAnchor="middle" fill="var(--muted)" fontSize="8">/ {budget} GiB</text>
@@ -258,7 +255,7 @@ export function VRAMVisualizer({ locale }: { locale: Locale }) {
       </div>
 
       <div className={`tokenizer-verdict ${estimate.fits ? "good" : "warn"}`}>
-        <b>{estimate.fits ? (tr ? "Bütçeye sığıyor" : "Fits the budget") : (tr ? "Bütçeyi aşıyor" : "Exceeds the budget")}</b>
+        <b>{estimate.fits ? (tr ? "Basitleştirilmiş tahmin bütçe altında" : "Simplified estimate is below budget") : (tr ? "Bütçeyi aşıyor" : "Exceeds the budget")}</b>
         <span>
           {tr
             ? `KV önbelleği (çıkarım) tahmini: ${estimate.kvCache.toFixed(2)} GiB. KV önbelleği çıkarım sırasında ek bellek gerektirir; eğitim sırasında sayılmaz.`
@@ -295,7 +292,7 @@ export function LossSimulator({ locale }: { locale: Locale }) {
   // SVG path
   const w = 600, h = 200, padX = 30, padY = 20;
   const xScale = (i: number) => padX + (i / (steps - 1)) * (w - 2 * padX);
-  const yMin = 0.5, yMax = 3.0;
+  const yMin = 0, yMax = Math.ceil(Math.max(...sim.train, ...sim.val));
   const yScale = (v: number) => h - padY - ((v - yMin) / (yMax - yMin)) * (h - 2 * padY);
 
   const trainPath = sim.train.map((v, i) => `${i === 0 ? "M" : "L"} ${xScale(i).toFixed(3)} ${yScale(v).toFixed(3)}`).join(" ");
@@ -318,27 +315,27 @@ export function LossSimulator({ locale }: { locale: Locale }) {
       <div className="loss-controls">
         <label className="field">
           <span>{tr ? "Öğrenme oranı" : "Learning rate"}</span>
-          <input type="range" min={0} max={100} value={Math.log10(lr) * 25 + 100} onChange={(e) => setLr(Math.pow(10, (Number(e.target.value) - 100) / 25))} />
+          <input aria-label={tr ? "Öğrenme oranı" : "Learning rate"} type="range" min={0} max={100} value={(Math.log10(lr) + 5) / Math.log10(500) * 100} onChange={(e) => setLr(Math.pow(10, -5 + Number(e.target.value) / 100 * Math.log10(500)))} />
           <small>{lr.toExponential(2)}</small>
         </label>
         <label className="field">
           <span>{tr ? "Etkin toplu iş" : "Effective batch"}</span>
-          <input type="range" min={1} max={50} value={Math.log2(batch) * 10} onChange={(e) => setBatch(Math.round(Math.pow(2, Number(e.target.value) / 10)))} />
+          <input aria-label={tr ? "Etkin toplu iş" : "Effective batch"} type="range" min={3} max={8} value={Math.log2(batch)} onChange={(e) => setBatch(2 ** Number(e.target.value))} />
           <small>{batch}</small>
         </label>
         <label className="field">
           <span>{tr ? "Dönem" : "Epoch"}</span>
-          <input type="range" min={1} max={8} value={epochs} onChange={(e) => setEpochs(Number(e.target.value))} />
+          <input aria-label={tr ? "Dönem" : "Epoch"} type="range" min={1} max={8} value={epochs} onChange={(e) => setEpochs(Number(e.target.value))} />
           <small>{epochs}</small>
         </label>
         <label className="field">
           <span>{tr ? "Aşırı öğrenme riski" : "Overfit risk"}</span>
-          <input type="range" min={0} max={10} value={overfitRisk * 10} onChange={(e) => setOverfitRisk(Number(e.target.value) / 10)} />
+          <input aria-label={tr ? "Aşırı öğrenme riski" : "Overfit risk"} type="range" min={0} max={10} value={overfitRisk * 10} onChange={(e) => setOverfitRisk(Number(e.target.value) / 10)} />
           <small>{(overfitRisk * 100).toFixed(0)}%</small>
         </label>
         <label className="field">
           <span>{tr ? "Toplam adım" : "Total steps"}</span>
-          <input type="range" min={5} max={50} value={steps / 20} onChange={(e) => setSteps(Math.round(Number(e.target.value) * 20))} />
+          <input aria-label={tr ? "Toplam adım" : "Total steps"} type="range" min={5} max={50} value={steps / 20} onChange={(e) => setSteps(Math.round(Number(e.target.value) * 20))} />
           <small>{steps}</small>
         </label>
       </div>
@@ -346,7 +343,7 @@ export function LossSimulator({ locale }: { locale: Locale }) {
       <div className="loss-chart">
         <svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label={tr ? "Kayıp eğrileri" : "Loss curves"}>
           {/* Grid */}
-          {[0.5, 1.0, 1.5, 2.0, 2.5, 3.0].map((v) => (
+          {Array.from({ length: 6 }, (_, i) => yMax * i / 5).map((v) => (
             <g key={v}>
               <line x1={padX} y1={yScale(v)} x2={w - padX} y2={yScale(v)} stroke="var(--line)" strokeWidth={0.5} strokeDasharray="2 3" />
               <text x={padX - 4} y={yScale(v) + 3} textAnchor="end" fontSize="8" fill="var(--muted)">{v.toFixed(1)}</text>
@@ -354,20 +351,20 @@ export function LossSimulator({ locale }: { locale: Locale }) {
           ))}
           {/* Best step marker */}
           <line x1={xScale(sim.bestStep)} y1={padY} x2={xScale(sim.bestStep)} y2={h - padY} stroke="var(--green)" strokeWidth={1} strokeDasharray="3 3" />
-          <text x={xScale(sim.bestStep) + 4} y={padY + 12} fontSize="9" fill="var(--green)">{tr ? "en iyi adım" : "best step"} ({sim.bestStep})</text>
+          <text x={Math.min(w - 140, xScale(sim.bestStep) + 4)} y={padY + 12} fontSize="9" fill="var(--green)">{tr ? "en iyi adım" : "best step"} ({sim.bestStep})</text>
           {/* Overfit point */}
           {sim.overfitPoint < steps && (
             <g>
               <line x1={xScale(sim.overfitPoint)} y1={padY} x2={xScale(sim.overfitPoint)} y2={h - padY} stroke="var(--red)" strokeWidth={1} strokeDasharray="3 3" />
-              <text x={xScale(sim.overfitPoint) + 4} y={h - padY - 4} fontSize="9" fill="var(--red)">{tr ? "aşırı öğrenme başlangıcı" : "overfit onset"} ({sim.overfitPoint})</text>
+              <text x={Math.min(w - 165, xScale(sim.overfitPoint) + 4)} y={h - padY - 4} fontSize="9" fill="var(--red)">{tr ? "aşırı öğrenme başlangıcı" : "overfit onset"} ({sim.overfitPoint})</text>
             </g>
           )}
           {/* Train */}
           <path d={trainPath} fill="none" stroke="var(--blue)" strokeWidth={2} />
           {/* Val */}
-          <path d={valPath} fill="none" stroke="var(--orange)" strokeWidth={2} strokeDasharray="4 3" />
+          <path d={valPath} fill="none" stroke="var(--chart-accent)" strokeWidth={2} strokeDasharray="4 3" />
           <text x={w - padX} y={padY + 8} textAnchor="end" fontSize="9" fill="var(--blue)">{tr ? "eğitim" : "train"}</text>
-          <text x={w - padX} y={padY + 20} textAnchor="end" fontSize="9" fill="var(--orange)">{tr ? "doğrulama" : "validation"}</text>
+          <text x={w - padX} y={padY + 20} textAnchor="end" fontSize="9" fill="var(--chart-accent)">{tr ? "doğrulama" : "validation"}</text>
         </svg>
       </div>
 
@@ -455,8 +452,8 @@ export function AttentionHeatmap({ locale }: { locale: Locale }) {
           <b>{tr ? "En yüksek dikkat" : "Highest attention"}</b>
           <span>
             {tr
-              ? `“${demo.tokens[maxIdx.i][locale]}” → “${demo.tokens[maxIdx.j][locale]}” (%${(maxIdx.v * 100).toFixed(0)}). Diyagonal (kendine dikkat) genellikle baskındır.`
-              : `“${demo.tokens[maxIdx.i][locale]}” → “${demo.tokens[maxIdx.j][locale]}” (${(maxIdx.v * 100).toFixed(0)}%). The diagonal (self-attention) usually dominates.`}
+              ? `“${demo.tokens[maxIdx.i][locale]}” → “${demo.tokens[maxIdx.j][locale]}” (%${(maxIdx.v * 100).toFixed(0)}). Bu örnekte diyagonal (kendine dikkat) baskındır; gerçek örüntü katmana, başlığa ve girdiye bağlıdır.`
+              : `“${demo.tokens[maxIdx.i][locale]}” → “${demo.tokens[maxIdx.j][locale]}” (${(maxIdx.v * 100).toFixed(0)}%). The diagonal (self-attention) dominates this example; real patterns depend on the layer, head, and input.`}
           </span>
         </div>
       </div>

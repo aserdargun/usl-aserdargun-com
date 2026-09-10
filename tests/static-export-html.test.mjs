@@ -39,3 +39,25 @@ test("publishes the current sitemap verification date", async () => {
   assert.match(sitemap, /2026-09-04/);
   assert.doesNotMatch(sitemap, /2026-08-10/);
 });
+
+test("every exported internal link resolves to an artifact", async () => {
+  const { readdir, stat } = await import("node:fs/promises");
+  const { join } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const exportRoot = fileURLToPath(new URL("out/", root));
+  const files = await readdir(exportRoot, { recursive: true });
+  const targets = new Set();
+  for (const file of files.filter((name) => name.endsWith(".html"))) {
+    const html = await readFile(join(exportRoot, file), "utf8");
+    for (const [, href] of html.matchAll(/href="(\/[^"#?]*)[^"]*"/g)) {
+      if (!href.startsWith("//")) targets.add(href);
+    }
+  }
+  assert.ok(targets.size > 30);
+  for (const target of targets) {
+    const path = join(exportRoot, decodeURIComponent(target));
+    const item = await stat(path).catch(() => null);
+    assert.ok(item, `Missing internal link target: ${target}`);
+    if (item.isDirectory()) await readFile(join(path, "index.html"));
+  }
+});
