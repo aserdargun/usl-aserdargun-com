@@ -29,17 +29,17 @@ export function PaperReadingHub({ locale }: { locale: Locale }) {
           <h2>{tr ? "Klasik makaleler" : "Classic Papers"}</h2>
           <p>
             {tr
-              ? "Her kavramın matematiksel temeli. 1 sayfalık özet; orijinal makaleyi okumadan önce başlangıç noktası olarak kullan."
-              : "Mathematical basis of each concept. 1-page summary; use as a starting point before reading the original paper."}
+              ? "Her kavramın matematiksel temeli. Kısa özet; orijinal makaleyi okumadan önce başlangıç noktası olarak kullan."
+              : "Mathematical basis of each concept. Short summary; use as a starting point before reading the original paper."}
           </p>
         </div>
         <EvidencePill locale={locale} level="observed" />
       </div>
       <div className="papers-grid">
         {papers.map((paper) => (
-          <article key={paper.id} className="paper-card">
+          <article key={paper.id} className="paper-card" data-content-id={paper.id}>
             <span className="kicker">{paper.year} · {paper.authors}</span>
-            <h3>{paper[locale].title}</h3>
+            <h3><a href={paper.url}>{paper[locale].title}</a></h3>
             <div className="paper-section">
               <span className="kicker">{tr ? "ANA FİKİR" : "TAKEAWAY"}</span>
               <p>{paper[locale].takeaway}</p>
@@ -80,7 +80,7 @@ export function CitationKitPanel({ locale }: { locale: Locale }) {
       </div>
       <div className="citation-list">
         {cites.map((c) => (
-          <article key={c.id} className="citation-item">
+          <article key={c.id} className="citation-item" data-content-id={c.id}>
             <div className="citation-head">
               <EvidencePill locale={locale} level={c.evidence} />
               <span className="kicker">{topics[c.topic as keyof typeof topics] ?? c.topic}</span>

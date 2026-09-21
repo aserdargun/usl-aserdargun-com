@@ -114,13 +114,14 @@ export function FlashcardsPage({ locale }: { locale: Locale }) {
       <div className="flash-stats">
         <div><b>{stats.seen}/{stats.total}</b><span>{tr ? "görülen kart" : "seen cards"}</span></div>
         <div><b>{stats.due}</b><span>{tr ? "tekrar zamanı gelen" : "due now"}</span></div>
-        <div><b>{tr ? `%${stats.accuracy}` : `${stats.accuracy}%`}</b><span>{tr ? "isabet" : "accuracy"}</span></div>
+        <div><b>{tr ? `%${stats.accuracy}` : `${stats.accuracy}%`}</b><span>{tr ? "öz değerlendirme" : "self-rating"}</span></div>
         <button className="reset-button" onClick={reset}>{tr ? "Sıfırla" : "Reset"}</button>
       </div>
 
       {card ? (
         <div
           ref={cardRef}
+          data-content-id={card.id}
           className={`flash-card ${flipped ? "flipped" : ""}`}
           role="button"
           aria-pressed={flipped}

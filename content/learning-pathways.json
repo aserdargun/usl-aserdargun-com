@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-21",
+  "links": [
+    {
+      "id": "pathway-aia",
+      "code": "AIA",
+      "url": "https://aia.aserdargun.com/",
+      "tr": {
+        "title": "AI haritası",
+        "description": "Temel kavramları ve öğrenme yolunu seç."
+      },
+      "en": {
+        "title": "AI map",
+        "description": "Choose foundations and a learning path."
+      }
+    },
+    {
+      "id": "pathway-adp",
+      "code": "ADP",
+      "url": "https://adp.aserdargun.com/",
+      "tr": {
+        "title": "Uyarlama laboratuvarı",
+        "description": "Full FT, LoRA ve QLoRA seçeneklerini sentetik deneylerle karşılaştır."
+      },
+      "en": {
+        "title": "Adaptation lab",
+        "description": "Compare Full FT, LoRA and QLoRA through synthetic experiments."
+      }
+    },
+    {
+      "id": "pathway-llm",
+      "code": "LLM",
+      "url": "https://llm.aserdargun.com/",
+      "tr": {
+        "title": "Model çalıştırma",
+        "description": "Token üretimi ve çıkarım davranışını keşfet."
+      },
+      "en": {
+        "title": "Model runtime",
+        "description": "Explore token generation and inference behavior."
+      }
+    },
+    {
+      "id": "pathway-evl",
+      "code": "EVL",
+      "url": "https://evl.aserdargun.com/",
+      "tr": {
+        "title": "Değerlendirme",
+        "description": "Bağımsız ölçüm, kalite ve kabul kararlarını incele."
+      },
+      "en": {
+        "title": "Evaluation",
+        "description": "Explore independent measurement, quality and acceptance decisions."
+      }
+    },
+    {
+      "id": "pathway-lcl",
+      "code": "LCL",
+      "url": "https://lcl.aserdargun.com/",
+      "tr": {
+        "title": "Yerel dağıtım",
+        "description": "Modeli yerelde çalıştırma seçeneklerini ve donanım kısıtlarını incele."
+      },
+      "en": {
+        "title": "Local deployment",
+        "description": "Explore local model runtime options and hardware constraints."
+      }
+    }
+  ]
+}

@@ -17,6 +17,8 @@ Bu repo, 50 Markdown dosyasındaki öğrenme notlarını arındırılmış ve et
 - 8 kontrollü laboratuvar: context bütçesi, effective batch, LoRA ölçeği, gerçek tokenizer girdisi, dataset karışımı, benchmark skoru, masking checklist ve 16 GB planlama rehberi
 - Cevap gönderilmeden açıklamayı göstermeyen 20 soruluk karma test; `%80` geçiş hedefi ve konu eksikleri
 - Kanıt seviyeleri: `verified`, `observed`, `planned`, `unknown`, `simulation`
+- 4 görsel simülasyon, 16 tekrar kartı ve özgün makale bağlantıları
+- AIA → USL → ADP / LLM / EVL / LCL öğrenme geçişleri; veri veya model aktarımı yok
 - Kaynak ilerlemesi ile ziyaretçinin “benim ilerlemem” durumunun açık ayrımı
 
 ### Yerel geliştirme
@@ -58,7 +60,7 @@ npm run validate:content
 - UUID, e-posta, mutlak kullanıcı yolu, görev provenance'ı, Obsidian plugin yolu ve özel operasyon adlarını temizler.
 - İki gerçek kırık loss/overfitting wiki bağlantısını birleşik kavrama yönlendirir; Obsidian tablolarındaki kaçışlı `\|` bağlantılarını doğru ayrıştırır.
 - Ham Journal anlatılarını “ilk düşünce → düzeltme → karar kuralı” kartlarına dönüştürür.
-- TR kaynak digest'ini ve TR/EN sabit kimlik eşliğini `content/locale-parity.json` içinde tutar. `stale` listesi boş değilse doğrulama başarısız olur.
+- TR kaynak digest'ini, 95 ortak içerik kimliğini ve incelenmiş TR/EN içerik digest'lerini `content/locale-parity.json` içinde tutar. `stale` listesi boş değilse veya kayıtlı digest güncel içerikle eşleşmiyorsa doğrulama başarısız olur. Senkronizasyon çevirileri otomatik onaylamaz; iki dil incelendikten sonra doğrulama kaydı yenilenir.
 
 ### Doğruluk sınırları
 
@@ -90,6 +92,8 @@ This repository turns 50 Markdown learning sources into a sanitized, interactive
 - Eight controlled labs for context, effective batch, LoRA scaling, real tokenizer inputs, dataset mix, benchmark scoring, masking checks, and 16 GB planning
 - A 20-question mixed assessment that hides explanations until submission, targets 80%, and reports topic gaps
 - Explicit evidence levels: `verified`, `observed`, `planned`, `unknown`, and `simulation`
+- Four visual simulations, 16 review cards, and original-paper links
+- AIA → USL → ADP / LLM / EVL / LCL learning links without data or model transfer
 - A clear separation between read-only source state and “my progress”
 
 ### Local development

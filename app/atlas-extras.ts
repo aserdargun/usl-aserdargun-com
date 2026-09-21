@@ -54,7 +54,7 @@ export const tokenizerSamples: Record<Locale, TokenizerSample[]> = {
 for (const sample of tokenizerSamples.tr) {
   sample.charCount = { tr: Array.from(sample.tr.text).length, en: Array.from(sample.en.text).length };
 }
-tokenizerSamples.en = tokenizerSamples.tr.map((sample) => ({ ...sample, id: sample.id.replace(/^tr-/, "en-") }));
+tokenizerSamples.en = tokenizerSamples.tr.map((sample) => ({ ...sample }));
 
 // BPE-benzeri parçalama: önce boşlukla böl, sonra uzun parçaları
 // alt-sözcüklere ayır. Akademik değil; yalnızca "yaklaşık gösterim".
@@ -126,7 +126,7 @@ export const flashcards: Record<Locale, Flashcard[]> = {
     { id: "fc-tpl-1", topic: "templates", tr: { front: "Doğru yaklaşım nedir?", back: "Rol/içerik kayıtlarını bağımsız sakla, her modelin şablonuyla işle." }, en: { front: "What is the right approach?", back: "Store role/content independently, render with each model's template." } },
     { id: "fc-tpl-2", topic: "templates", tr: { front: "Yanlış delimiter ne yapar?", back: "Cevap loss dışında kalabilir ya da prompt yanlışlıkla eğitilir." }, en: { front: "What does a wrong delimiter do?", back: "Assistant answers may be excluded from loss; prompt may be trained by accident." } },
     // evaluation
-    { id: "fc-eval-1", topic: "evaluation", tr: { front: "Veri karışımı (önerilen)?", back: "%55 standart, %10 parafraz, %15 eksik bilgi, %10 negatif, %10 eskalasyon." }, en: { front: "Recommended data mix?", back: "55% standard, 10% paraphrase, 15% missing info, 10% negative, 10% escalation." } },
+    { id: "fc-eval-1", topic: "evaluation", tr: { front: "Atlasın örnek veri karışımı?", back: "%55 standart, %10 parafraz, %15 eksik bilgi, %10 negatif, %10 eskalasyon." }, en: { front: "What is the atlas’s illustrative data mix?", back: "55% standard, 10% paraphrase, 15% missing info, 10% negative, 10% escalation." } },
     { id: "fc-eval-2", topic: "evaluation", tr: { front: "Geçerli JSON neyi garanti eder?", back: "Yalnız yapı geçerliliği; içerik doğruluğu ve güvenlik ayrı test edilir." }, en: { front: "What does valid JSON guarantee?", back: "Only structural validity; correctness and safety need separate tests." } },
   ],
   en: [],
@@ -158,30 +158,30 @@ export interface ConceptDepth {
 export const conceptDepth: Record<string, Partial<Record<Locale, ConceptDepth>>> = {
   models: {
     tr: {
-      layman: { tr: "Bir modeli, önceden eğitilmiş bir kafayla doğan çocuğa benzet. Base henüz konuşmayı öğrenmemiş; Instruct konuşma eğitimi almış; Reasoning ise düşünmeyi öğrenmiş. Hangi çocukla başlayacağın, ne yapmak istediğine bağlı.", en: "Think of a model as a child born with a pretrained brain. Base has not learned to talk; Instruct has had a conversation course; Reasoning has learned to think step by step. Which child to start with depends on what you want to do." },
-      undergrad: { tr: "Base, sonraki-token tahmini için eğitilmiş ham ağırlıklardır. Instruct, SFT ve/veya RLHF ile konuşma ve talimat takip edecek şekilde hizalanmıştır. Reasoning, ek bir RL aşamasıyla adım adım düşünme davranışı kazanır. Hangi checkpoint'i fine-tune edeceğin, hedef görevin doğasına bağlıdır.", en: "Base is raw weights trained for next-token prediction. Instruct is aligned with SFT and/or RLHF to follow conversation and instructions. Reasoning acquires step-by-step thinking via an additional RL stage. Which checkpoint you fine-tune depends on the nature of the target task." },
-      advanced: { tr: "Modeller alignment pipeline'ında farklı aşamalardan geçer. Base, self-supervised next-token prediction ile bir tokenizer-V üzerinde eğitilir. Instruct için tipik olarak SFT (cross-entropy) ve ardından preference optimization (RLHF/DPO) uygulanır. Reasoning yetenekleri genellikle outcome-based RL (GRPO, RLOO) ile emergent davranış olarak ortaya çıkar. Adapter'ın eğitim yükü: Base ≫ Instruct > Reasoning, çünkü alignment zaten bias'ı ayarlamıştır.", en: "Models go through different stages in the alignment pipeline. Base is trained with self-supervised next-token prediction over a tokenizer-V. For Instruct, typically SFT (cross-entropy) followed by preference optimization (RLHF/DPO) is applied. Reasoning abilities usually emerge from outcome-based RL (GRPO, RLOO) as an emergent behavior. Adapter training load: Base ≫ Instruct > Reasoning, because alignment has already set the bias." },
+      layman: { tr: "Base model dil örüntülerini ön-eğitimden öğrenir; talimat takibi garanti değildir. Instruct talimat izleme için uyarlanır. Reasoning bir yetenek özelliğidir ve Instruct ile birlikte bulunabilir.", en: "A base model learns language patterns during pretraining; instruction following is not guaranteed. Instruct is adapted for following instructions. Reasoning is a capability that can coexist with Instruct." },
+      undergrad: { tr: "Base, ön-eğitimden gelen başlangıç ağırlıklarıdır. Instruct, SFT ve tercih optimizasyonu gibi yöntemlerle talimat takibine uyarlanabilir. Reasoning davranışı gözetimli örnekler, damıtma veya RL ile desteklenebilir; yalnız RL gerektirmez.", en: "Base provides pretrained starting weights. Instruct can use SFT and preference optimization for instruction following. Reasoning behavior may be supported by supervised examples, distillation or RL; RL is not required in every case." },
+      advanced: { tr: "Model etiketi eğitim maliyetini sıralamaz. Başlangıç checkpoint’ini görev, veri, lisans ve sabit benchmark ile seç; Base, Instruct ve Reasoning arasında evrensel bir adapter eğitim yükü sıralaması yoktur.", en: "Model labels do not rank training cost. Choose a checkpoint using task, data, license and a fixed benchmark; there is no universal adapter training-load ordering across Base, Instruct and Reasoning." },
     },
   },
   tokens: {
     tr: {
-      layman: { tr: "Her kelimeyi bilgisayar tek parça halinde okuyamaz; önce küçük parçalara böler. Bu parçaların her birine 'token' denir. Türkçe, İngilizce'den daha karmaşık olduğu için daha çok parçaya bölünür. Bu, modele gönderdiğin metnin 'daha ağır' olması demektir.", en: "The computer cannot read each word as a whole; it first breaks it into small pieces. Each piece is called a token. Turkish is more complex than English, so it splits into more pieces. That means the text you send the model is 'heavier'." },
-      undergrad: { tr: "BPE veya SentencePiece gibi alt-sözcük tokenizer'lar, kelimeleri sıklık temelli parçalara ayırır. Türkçe gibi eklemeli (agglutinative) diller, sık başvurulan ekler yüzünden tek bir kelimede çok sayıda alt-sözcük üretir. Bu, context penceresinin daha hızlı dolması ve maliyetin artması anlamına gelir.", en: "Sub-word tokenizers like BPE or SentencePiece split words into frequency-based pieces. Agglutinative languages like Turkish generate many sub-pieces per word due to rich morphology. This means the context window fills faster and cost rises." },
+      layman: { tr: "Tokenizer metni kelime, kelime parçası veya noktalama gibi birimlere böler. Aynı anlam farklı dillerde farklı sayıda token üretebilir; farkı hedef tokenizer ile ölç.", en: "A tokenizer splits text into units such as words, word pieces or punctuation. The same meaning may use different token counts across languages; measure the difference with the target tokenizer." },
+      undergrad: { tr: "BPE bir alt-sözcük algoritmasıdır; SentencePiece farklı algoritmaları destekleyen bir araçtır. Token sayısı sözlük, normalleştirme ve metne bağlıdır. Türkçe için sabit bir maliyet çarpanı kullanma; eş anlamlı metinleri aynı tokenizer ve şablonla ölç.", en: "BPE is a subword algorithm; SentencePiece is a toolkit supporting multiple algorithms. Token count depends on vocabulary, normalization and text. Avoid a fixed Turkish cost multiplier; measure paired meanings with the same tokenizer and template." },
       advanced: { tr: "BPE birleştirmeleri sıklık temellidir; nadir bayt çiftleri sona kalır. Türkçe morfolojisi parça dağılımını etkileyebilir, ancak fark tokenizer'a ve metne bağlıdır. Doğru ölçüm hedef modelin gerçek tokenizer'ıyla yapılmalı; kesme, doldurma ve özel tokenlar da hesaba katılmalıdır.", en: "BPE merges are frequency-based; rare byte pairs remain at the end. Turkish morphology can affect the piece distribution, but the difference depends on the tokenizer and text. Measure with the target model's real tokenizer, including truncation, padding, and special tokens." },
     },
   },
   lora: {
     tr: {
       layman: { tr: "Dev bir kitabın arasına küçük yapışkan notlar iliştirmek gibi. Kitabı değiştirmezsin, sadece yorumunu eklersin. Adapter'ı çıkarınca orijinal kitap geri gelir. QLoRA ise kitabın kendisini 'küçültülmüş' tutar (4-bit), böylece aynı masada daha çok şey sığar.", en: "Like sticking small sticky notes into a huge textbook. You do not change the book, you just add your commentary. Remove the adapters and the original book comes back. QLoRA keeps the book itself 'shrunken' (4-bit) so more fits on the same desk." },
-      undergrad: { tr: "LoRA, W' = W + scale·BA biçiminde düşük-rank bir düzeltme öğrenir. Sadece A ve B eğitilir, W donuk kalır. QLoRA, W'yi 4-bit (NF4) olarak saklar; A/B ve kritik hesaplar daha yüksek hassasiyette kalabilir. Bu, 16 GB sınıfı GPU'larda 7B+ model eğitimini pratik hale getirir.", en: "LoRA learns a low-rank correction W' = W + scale·BA. Only A and B are trained; W stays frozen. QLoRA stores W in 4-bit (NF4); A/B and critical compute can stay at higher precision. This makes 7B+ training practical on 16 GB class GPUs." },
-      advanced: { tr: "LoRA, optimal ΔW'nin düşük-rank manifold'a izdüşümüdür (Aghajanyan et al., 2020). NF4 quantization, normal dağılım varsayımıyla 4-bit'e informatik olarak optimal basamaklandırma yapar (Dettmers et al., 2023). Page Optimizer (paged optimizer states) ve double-quantization, peak VRAM'i daha da düşürür. B=0 başlangıcı, ilk forward'da gradyan sinyali için kritik; eğer sıfırdan başlamazsan, taban davranışından sapan rastgele bir gürültüyle başlarsın.", en: "LoRA is the projection of the optimal ΔW onto a low-rank manifold (Aghajanyan et al., 2020). NF4 quantization does information-theoretically optimal 4-bit bucketing under a normal-distribution assumption (Dettmers et al., 2023). Paged optimizer states and double-quantization further lower peak VRAM. The B=0 initialization is critical for gradient signal on the first forward; if you do not start at zero, you start with random noise that deviates from base behavior." },
+      undergrad: { tr: "LoRA, W' = W + scale·BA biçiminde düşük-rank bir düzeltme öğrenir. Sadece A ve B eğitilir, W donuk kalır. QLoRA, W'yi 4-bit (NF4) olarak saklar; A/B ve kritik hesaplar daha yüksek hassasiyette kalabilir. Gerçek bellek uygunluğu model, bağlam, toplu iş ve çalışma zamanına bağlıdır; 16 GB garanti değildir.", en: "LoRA learns a low-rank correction W' = W + scale·BA. Only A and B are trained; W stays frozen. QLoRA stores W in 4-bit (NF4); A/B and critical compute can stay at higher precision. Actual memory fit depends on the model, context, batch and runtime; 16 GB is not a guarantee." },
+      advanced: { tr: "LoRA, tam güncellemeyi önce hesaplayıp yansıtmak yerine BA düşük-rank güncellemesini doğrudan öğrenir. Varsayılan rastgele A ve sıfır B başlangıcı kimlik dönüşümünü korur; PiSSA ve diğer başlangıçlar farklıdır. QLoRA’nın NF4, çift niceleme ve sayfalı optimizer seçenekleri bellek yükünü azaltmayı hedefler; gerçek peak ayrıca ölçülür.", en: "LoRA directly learns the low-rank update BA rather than first computing and projecting a full update. Default random A and zero B preserve the identity transformation; PiSSA and other initializations differ. QLoRA uses NF4, double quantization and paged optimizers to reduce memory pressure; actual peak memory needs measurement." },
     },
   },
   rank: {
     tr: {
       layman: { tr: "Adapter'ı küçük bir defter gibi düşün. Rank, defterdeki sayfa sayısıdır. Daha çok sayfa = daha çok not yeri = daha çok şey öğrenebilir. Ama her sayfaya ne kadar yazdığını alpha belirler; çok yazarsan eski notlar silikleşir, az yazarsan yer boş kalır.", en: "Think of the adapter as a small notebook. Rank is the number of pages. More pages = more space = more learning. But how much you write per page is set by alpha; too much and old notes blur, too little and space is wasted." },
       undergrad: { tr: "Rank r, A ∈ R^(r×d_in) ve B ∈ R^(d_out×r) matrislerinin iç boyutudur. Parametre sayısı r × (d_in + d_out) ile ölçeklenir. Alpha, ölçek çarpanıdır: standart LoRA'da α/r, rsLoRA'da α/√r. Aynı etkin ölçek korunsa bile, yüksek rank daha çok kapasite taşır ve overfitting riski artar.", en: "Rank r is the inner dimension of A ∈ R^(r×d_in) and B ∈ R^(d_out×r). Parameter count scales as r × (d_in + d_out). Alpha is the scale factor: α/r in standard LoRA, α/√r in rsLoRA. Even if effective scale is held constant, higher rank carries more capacity and increases overfitting risk." },
-      advanced: { tr: "Effective rank'in (gerçek kullanılan rank) nominal r'ten düşük olabileceğini gösteren çalışmalar var (Aghajanyan et al., 2023). Yüksek rank'ın getirisi, veri karmaşıklığı ve task diversity ile ilişkili; linear probing ile adapter'ın hangi alt-uzayı öğrendiği ölçülebilir. Target modules, mimari-spesifik olup eğitim öncesinde model.named_modules() ile doğrulanmalıdır.", en: "Studies show effective rank (the actually-used rank) can be lower than nominal r (Aghajanyan et al., 2023). The benefit of higher rank correlates with data complexity and task diversity; linear probing can measure which subspace the adapter has learned. Target modules are architecture-specific and must be verified with model.named_modules() before training." },
+      advanced: { tr: "BA güncellemesinin rankı en fazla r’dir; öğrenilmiş rank daha düşük olabilir. r × (d_in + d_out) her hedef matrisin parametre sayısıdır. Hedef modülleri model.named_modules() ile doğrula; rank deneyinde etkin ölçeği ve diğer ayarları kaydet.", en: "The rank of BA is at most r; its learned rank may be lower. r × (d_in + d_out) counts parameters per target matrix. Verify target modules with model.named_modules(); record effective scaling and other settings when comparing ranks." },
     },
   },
   steps: {
@@ -193,23 +193,23 @@ export const conceptDepth: Record<string, Partial<Record<Locale, ConceptDepth>>>
   },
   loss: {
     tr: {
-      layman: { tr: "Sınava çalışırken yaptığın deneme testleri eğitim kaybı; sınavın kendisi doğrulama kaybı gibidir. Düşük deneme kaybı, yüksek sınav puanını garanti etmez. Sadece deneme sonucuna bakıp 'bitti' demek, gerçek sınavda hayal kırıklığı yaratır.", en: "Practice tests during your study are training loss; the exam itself is validation loss. A low practice score does not guarantee a high exam score. Calling it done by practice score alone creates disappointment at the real exam." },
+      layman: { tr: "Training loss çalıştığın sorulardaki hata, validation loss görülmemiş kontrol sorularındaki hata gibidir. Çalışma sorularında az hata, bağımsız sorularda da az hata olacağını garanti etmez.", en: "Training loss is like errors on practiced questions; validation loss is errors on unseen review questions. Low practice error does not guarantee low error on independent questions." },
       undergrad: { tr: "Training loss, optimize edilen hedefe uyumu ölçer. Validation loss, görülmemiş split üzerindeki genellemeyi ölçer. Train düşerken validation yükseliyorsa overfitting. Catastrophic forgetting farklıdır: yeni yetenek kazanırken eski/genel yetenek geriler. Loss tek başına kalite kanıtı değildir; domain/format/safety metrikleri de ölçülmelidir.", en: "Training loss measures fit to the optimized target. Validation loss measures generalization on an unseen split. If train falls while validation rises, that is overfitting. Catastrophic forgetting is different: new ability improves while prior/general ability declines. Loss is not by itself a quality proof; domain/format/safety metrics must also be measured." },
-      advanced: { tr: "Loss eğrisi tek başına yeterli değildir: gradient norm, learning rate ve batch composition da izlenmelidir. Validation loss 'U-şekli' (val↓ sonra val↑) klasik overfitting sinyalidir; 'monoton artış' ise data mismatch / training instability'ye işaret eder. Forgetting tespiti için orthogonal evaluation (MMLU, domain benchmark) veya FWT/PWT oranı kullanılır. Adapter kapatınca davranış düzeliyorsa, sorun tabanda değil adapter kaynaklı girişimdir.", en: "Loss curve alone is not enough: gradient norm, learning rate, and batch composition should also be monitored. The U-shape in validation loss (val↓ then val↑) is the classic overfitting signal; monotonic increase signals data mismatch or training instability. Forgetting is detected with orthogonal evaluation (MMLU, domain benchmark) or FWT/PWT ratio. If behavior recovers when the adapter is disabled, the problem is not the base but adapter-induced interference." },
+      advanced: { tr: "Loss yanında gradient norm, learning rate ve veri karışımını izle. Train/validation ayrışması bir teşhis sinyalidir; nedeni tek başına kanıtlamaz. Forgetting için önceki görevlerin sabit benchmark’ını tekrar ölç. Adapter kapatılınca düzelme, adapter kaynaklı girişime işaret eder.", en: "Monitor gradient norm, learning rate and data mix alongside loss. Train/validation divergence is a diagnostic signal, not proof of its cause. Re-evaluate fixed prior-task benchmarks for forgetting. Recovery after disabling the adapter indicates adapter-induced interference." },
     },
   },
   templates: {
     tr: {
       layman: { tr: "Bir mektup şablonu: 'Sayın X, ... Saygılarımla Y'. İçerik aynı ama biçim modele göre değişir. Şablon yanlışsa hitap ve kapanış yanlış yere düşer. Model için de benzer: aynı role/content kaydı, modele göre farklı token dizisine dönüşür.", en: "A letter template: 'Dear X, ... Sincerely, Y'. The content is the same but the format changes per model. With the wrong template, the salutation and sign-off land in the wrong place. For models it is similar: the same role/content record turns into a different token sequence per model." },
       undergrad: { tr: "Her modelin kendi chat template'i vardır (ChatML, Llama-3, Qwen, Phi). role/content kayıtlarını modelden bağımsız sakla; her model için kendi tokenizer ve template'iyle yeniden render et. Response-only masking'de assistant sınırları gerçek render ile eşleşmezse cevap loss dışında kalabilir.", en: "Each model has its own chat template (ChatML, Llama-3, Qwen, Phi). Store role/content records independently of the model; re-render with each model's own tokenizer and template. In response-only masking, if the assistant boundaries do not match the real render, the answer can fall outside the loss." },
-      advanced: { tr: "Template farkları; BOS/EOS, role token'ları, system prompt formatı ve assistant header/footer'da saklıdır. Aynı dataset Llama-3 ile ortalama 110 token, Qwen-2 ile 95 token üretebilir. Inference sırasında aynı template + aynı stop sequence kullanılmazsa train/inference dağılım kayması olur. Test için: tek bir örneği render et, BOS, role sınırı ve EOS'u görünür kıl, label'ları inspect et.", en: "Template differences hide in BOS/EOS, role tokens, system prompt format, and assistant header/footer. The same dataset can produce on average 110 tokens with Llama-3 and 95 tokens with Qwen-2. If inference uses a different template or stop sequence than training, train/inference distribution shift occurs. To test: render a single example, expose BOS, role boundary and EOS, inspect labels." },
+      advanced: { tr: "BOS/EOS, rol tokenları ve assistant sınırları checkpoint’e bağlıdır. Belirli bir modelin daha az token ürettiğini ölçmeden varsayma. Eğitim ve çıkarımda uyumlu şablon kullan; render edilmiş örneği, özel tokenları ve loss maskesini incele.", en: "BOS/EOS, role tokens and assistant boundaries depend on the checkpoint. Do not assume a model produces fewer tokens without measuring it. Use compatible templates for training and inference; inspect a rendered example, special tokens and the loss mask." },
     },
   },
   evaluation: {
     tr: {
       layman: { tr: "Bir arabanın yalnız hızına değil, frenine, yakıt tüketimine, güvenliğine ve konforuna da bakarsın. Tek metrik yanıltıcıdır. Model değerlendirmesinde de 'hız' = loss; ama asıl önemli olan 'fren, güvenlik, konfor' = domain, format, safety, retention.", en: "You do not judge a car by speed alone; you also look at brakes, fuel economy, safety, and comfort. A single metric is misleading. In model evaluation, 'speed' is loss; but what really matters is 'brakes, safety, comfort' = domain, format, safety, retention." },
-      undergrad: { tr: "Train/validation/test split'leri ayrı kaynaklardan dondurulmalıdır. Veri karışımı önerisi: %55 standart, %10 parafraz, %15 eksik bilgi, %10 negatif, %10 eskalasyon. 100 soruluk benchmark domain/format/safety/uncertainty/retention ağırlıklı ortalama ile skorlanır. Eğitim verisini evaluation'da kullanmak genelleme kanıtı değildir.", en: "Train/validation/test splits must be frozen from separate sources. Recommended data mix: 55% standard, 10% paraphrase, 15% missing info, 10% negative, 10% escalation. A 100-question benchmark scores with a weighted average of domain/format/safety/uncertainty/retention. Reusing training data for evaluation is not generalization evidence." },
-      advanced: { tr: "Eval split'in training'den mutlak ayrı olması yetmez; kaynak, zaman ve operatör tarafı da ayrışmalıdır (temporal split, operator split). Bootstrap confidence interval veya paired bootstrap ile metrik farkının anlamlılığı test edilir. Human eval LLM-as-judge ile ikame edilebilir, ancak bias kontrolü gerekir (position bias, verbosity bias). Safety metrikleri için red-team prompt koleksiyonu ve adversarial augmentation önerilir.", en: "It is not enough that the eval split is strictly separate from training; source, time, and operator side must also be separate (temporal split, operator split). Bootstrap confidence interval or paired bootstrap tests metric difference significance. Human eval can be substituted by LLM-as-judge but requires bias control (position bias, verbosity bias). For safety metrics, a red-team prompt collection and adversarial augmentation are recommended." },
+      undergrad: { tr: "Train/validation/test split'leri ayrı kaynaklardan dondurulmalıdır. Bu atlasın örnek veri karışımı (evrensel öneri değil): %55 standart, %10 parafraz, %15 eksik bilgi, %10 negatif, %10 eskalasyon. 100 soruluk benchmark domain/format/safety/uncertainty/retention ağırlıklı ortalama ile skorlanır. Eğitim verisini evaluation'da kullanmak genelleme kanıtı değildir.", en: "Train/validation/test splits must be frozen from separate sources. This atlas’s illustrative data mix (not universal): 55% standard, 10% paraphrase, 15% missing info, 10% negative, 10% escalation. A 100-question benchmark scores with a weighted average of domain/format/safety/uncertainty/retention. Reusing training data for evaluation is not generalization evidence." },
+      advanced: { tr: "Split stratejisini kullanım senaryosuna göre kaynak, zaman veya varlık üzerinden kur; yakın kopyaları kontrol et. Metrik farklarına örnek sayısı ve uygun güven aralığı ekle. LLM-as-judge yardımcı bir ölçümdür; insan değerlendirmesine karşı kalibre edilmeli, konum ve uzunluk yanlılıkları incelenmelidir.", en: "Choose source, time or asset splits for the deployment setting and check near duplicates. Report sample counts and suitable confidence intervals for metric differences. LLM-as-judge is a supporting measure; calibrate it against human evaluation and inspect position and length bias." },
     },
   },
 };
@@ -252,6 +252,7 @@ export interface PaperSummary {
   id: string;
   year: number;
   authors: string;
+  url: string;
   tr: { title: string; takeaway: string; relevance: string; citation: string };
   en: { title: string; takeaway: string; relevance: string; citation: string };
 }
@@ -260,6 +261,7 @@ export const paperReadings: Record<Locale, PaperSummary[]> = {
   tr: [
     {
       id: "attention-is-all-you-need",
+      url: "https://arxiv.org/abs/1706.03762",
       year: 2017,
       authors: "Vaswani et al.",
       tr: {
@@ -277,6 +279,7 @@ export const paperReadings: Record<Locale, PaperSummary[]> = {
     },
     {
       id: "lora-paper",
+      url: "https://arxiv.org/abs/2106.09685",
       year: 2021,
       authors: "Hu et al.",
       tr: {
@@ -287,13 +290,14 @@ export const paperReadings: Record<Locale, PaperSummary[]> = {
       },
       en: {
         title: "LoRA: Low-Rank Adaptation of Large Language Models",
-        takeaway: "Projects ΔW onto a low-rank manifold, reducing trainable parameters by up to 10,000×. Adapter is reversibly added to the original model.",
+        takeaway: "Learns a low-rank weight update; the paper reports up to 10,000× fewer trainable parameters in its GPT-3 175B comparison. This is not a universal reduction factor.",
         relevance: "Original source of the LoRA concept. The r × (d_in + d_out) formula and alpha/r scale come from here.",
         citation: "Hu, E.J. et al. (2021). LoRA: Low-Rank Adaptation of Large Language Models. arXiv:2106.09685.",
       },
     },
     {
       id: "qlora-paper",
+      url: "https://arxiv.org/abs/2305.14314",
       year: 2023,
       authors: "Dettmers et al.",
       tr: {
@@ -311,6 +315,7 @@ export const paperReadings: Record<Locale, PaperSummary[]> = {
     },
     {
       id: "grpo-paper",
+      url: "https://arxiv.org/abs/2402.03300",
       year: 2024,
       authors: "Shao et al. (DeepSeek)",
       tr: {
@@ -608,15 +613,15 @@ export interface AttentionDemo {
 export const attentionDemos: Record<Locale, AttentionDemo> = {
   tr: {
     tokens: [
-      { tr: "Model", en: "The" },
-      { tr: "Türkçe", en: "model" },
-      { tr: "metni", en: "tokenizes" },
-      { tr: "daha", en: "Turkish" },
-      { tr: "fazla", en: "into" },
-      { tr: "token", en: "more" },
-      { tr: "olarak", en: "tokens" },
-      { tr: "böler", en: "than" },
-      { tr: ".", en: "English" },
+      { tr: "Bu", en: "This" },
+      { tr: "öğretici", en: "teaching" },
+      { tr: "örnek", en: "example" },
+      { tr: "kelimeler", en: "shows" },
+      { tr: "arasındaki", en: "illustrative" },
+      { tr: "temsili", en: "attention" },
+      { tr: "dikkat", en: "relationships" },
+      { tr: "ilişkilerini", en: "between" },
+      { tr: "gösterir", en: "words" },
     ],
     // Deterministik: 9x9. Satır bazlı normalize edilir.
     matrix: [
@@ -633,15 +638,15 @@ export const attentionDemos: Record<Locale, AttentionDemo> = {
   },
   en: {
     tokens: [
-      { tr: "The", en: "The" },
-      { tr: "model", en: "model" },
-      { tr: "tokenizes", en: "tokenizes" },
-      { tr: "Turkish", en: "Turkish" },
-      { tr: "into", en: "into" },
-      { tr: "more", en: "more" },
-      { tr: "tokens", en: "tokens" },
-      { tr: "than", en: "than" },
-      { tr: "English", en: "English" },
+      { tr: "Bu", en: "This" },
+      { tr: "öğretici", en: "teaching" },
+      { tr: "örnek", en: "example" },
+      { tr: "kelimeler", en: "shows" },
+      { tr: "arasındaki", en: "illustrative" },
+      { tr: "temsili", en: "attention" },
+      { tr: "dikkat", en: "relationships" },
+      { tr: "ilişkilerini", en: "between" },
+      { tr: "gösterir", en: "words" },
     ],
     matrix: [
       [0.55, 0.10, 0.10, 0.05, 0.05, 0.05, 0.05, 0.04, 0.01],

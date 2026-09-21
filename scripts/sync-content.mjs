@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { basename, join, relative, resolve, sep } from "node:path";
 
+import { currentReview } from "./content-contract.mjs";
+
 const projectRoot = resolve(new URL("..", import.meta.url).pathname);
 if (!process.env.UNSLOTH_VAULT_PATH) throw new Error("Set UNSLOTH_VAULT_PATH to the canonical vault directory before running content:sync");
 const vaultRoot = resolve(process.env.UNSLOTH_VAULT_PATH);
@@ -112,15 +114,18 @@ for (let index = 0; index < files.length; index += 1) {
 
 if (unresolved.length) throw new Error(`Unresolved wiki links:\n${unresolved.map(({ sourcePath, target }) => `- ${sourcePath} -> ${target}`).join("\n")}`);
 
-const lessonIds = ["models", "tokens", "lora", "rank", "steps", "loss", "templates", "evaluation"];
-const weekIds = Array.from({ length: 12 }, (_, index) => `week-${String(index + 1).padStart(2, "0")}`);
-const quizIds = Array.from({ length: 20 }, (_, index) => `q${String(index + 1).padStart(2, "0")}`);
-const parityIds = [...lessonIds, ...weekIds, ...quizIds];
+const sourceDigest = sha256(records.map(({ sourceHash }) => sourceHash).join(""));
+const previousParity = JSON.parse(await readFile(join(outputRoot, "locale-parity.json"), "utf8"));
+const stale = new Set(previousParity.stale ?? []);
+if (previousParity.sourceDigest !== sourceDigest) stale.add("source-review-required");
+for (const locale of ["tr", "en"]) {
+  if (previousParity.reviewedContentDigests?.[locale] !== currentReview(locale).digest) stale.add(`${locale}-content-review-required`);
+}
 const generatedAt = new Date().toISOString();
 
 await mkdir(outputRoot, { recursive: true });
 await writeFile(join(outputRoot, "public-snapshot.json"), JSON.stringify({ schemaVersion: 1, generatedAt, sourceCount: records.length, records }, null, 2) + "\n");
 await writeFile(join(outputRoot, "source-manifest.json"), JSON.stringify({ schemaVersion: 1, generatedAt, expected: 50, covered: manifest.length, unresolvedLinks: 0, entries: manifest }, null, 2) + "\n");
-await writeFile(join(outputRoot, "locale-parity.json"), JSON.stringify({ schemaVersion: 1, sourceLocale: "tr", translations: { tr: parityIds, en: parityIds }, stale: [], sourceDigest: sha256(records.map(({ sourceHash }) => sourceHash).join("")) }, null, 2) + "\n");
+await writeFile(join(outputRoot, "locale-parity.json"), JSON.stringify({ ...previousParity, stale: [...stale] }, null, 2) + "\n");
 
-console.log(`Synced ${manifest.length}/50 Markdown sources; unresolved wiki links: 0; locale parity IDs: ${parityIds.length}/${parityIds.length}.`);
+console.log(`Synced ${manifest.length}/50 Markdown sources; unresolved wiki links: 0; pending translation reviews: ${stale.size}.`);

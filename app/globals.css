@@ -799,3 +799,9 @@ footer a:hover { color: var(--orange); }
 
 .field input[aria-invalid="true"] { border-color: var(--red); }
 .field input[aria-invalid="true"] + small { color: var(--red); overflow-wrap: anywhere; }
+
+/* Compact cross-atlas learning links share the existing card style. */
+.portfolio-pathways { scroll-margin-top: 7rem; }
+.portfolio-pathways .lesson-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); }
+.portfolio-pathways .lesson-tile { min-height: 210px; }
+@media (max-width: 600px) { .portfolio-pathways .section-heading { flex-direction: column; } }

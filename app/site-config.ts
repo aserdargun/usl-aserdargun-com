@@ -15,7 +15,7 @@ export const baseMetadata: Metadata = {
     shortcut: ["/icon.png"],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
-  openGraph: { type: "website", url: "https://usl.aserdargun.com", siteName: "USL - Unsloth Studio Learning", title: "USL - Unsloth Studio Learning", description: "From first principles to evidence-backed fine-tuning on a 16 GB GPU.", images: [{ url: "/og.png", width: 1536, height: 1024, alt: "USL - Unsloth Studio Learning" }] },
+  openGraph: { type: "website", url: "https://usl.aserdargun.com", siteName: "USL - Unsloth Studio Learning", title: "USL - Unsloth Studio Learning", description: "Learn model adaptation through bilingual lessons, teaching simulations and historical evidence. No live training.", images: [{ url: "/og.png", width: 1536, height: 1024, alt: "USL - Unsloth Studio Learning" }] },
   twitter: { card: "summary_large_image", title: "USL - Unsloth Studio Learning", description: "A bilingual, evidence-aware path from LoRA concepts to local deployment.", images: ["/og.png"] },
 };
 

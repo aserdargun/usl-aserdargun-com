@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
+import { validateIntegrity } from "./content-contract.mjs";
+
 const root = resolve(new URL("..", import.meta.url).pathname);
 const snapshot = JSON.parse(await readFile(resolve(root, "content/public-snapshot.json"), "utf8"));
 const manifest = JSON.parse(await readFile(resolve(root, "content/source-manifest.json"), "utf8"));
@@ -13,7 +15,7 @@ if (manifest.unresolvedLinks !== 0 || manifest.entries.some((entry) => entry.bro
 if (new Set(manifest.entries.map((entry) => entry.sourcePath)).size !== 50) fail("Source paths are not unique");
 if (new Set(manifest.entries.map((entry) => entry.recordId)).size !== 50) fail("Record IDs are not unique");
 
-const serialized = JSON.stringify(snapshot);
+const serialized = JSON.stringify({ snapshot, manifest, parity });
 const banned = [
   [/\/(?:Users|home)\//i, "absolute local path"],
   [/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i, "email address"],
@@ -25,6 +27,6 @@ for (const [pattern, label] of banned) if (pattern.test(serialized)) fail(`Sanit
 
 if (parity.stale.length) fail(`Stale translations: ${parity.stale.join(", ")}`);
 if (JSON.stringify(parity.translations.tr) !== JSON.stringify(parity.translations.en)) fail("TR/EN stable content IDs are not identical");
-if (parity.translations.tr.length !== 40) fail("Expected 40 stable curriculum/quiz IDs per locale");
+validateIntegrity(snapshot, manifest, parity);
 
 console.log("Content validation passed: 50/50 sources, 0 unresolved links, sanitization clean, TR/EN parity complete.");

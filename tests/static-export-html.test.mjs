@@ -36,7 +36,7 @@ test("publishes canonical and source links for the usl deployment contract", asy
 
 test("publishes the current sitemap verification date", async () => {
   const sitemap = await readFile(new URL("out/sitemap.xml", root), "utf8");
-  assert.match(sitemap, /2026-09-04/);
+  assert.match(sitemap, /2026-09-21/);
   assert.doesNotMatch(sitemap, /2026-08-10/);
 });
 
@@ -59,5 +59,22 @@ test("every exported internal link resolves to an artifact", async () => {
     const item = await stat(path).catch(() => null);
     assert.ok(item, `Missing internal link target: ${target}`);
     if (item.isDirectory()) await readFile(join(path, "index.html"));
+  }
+});
+
+test("both languages expose portfolio learning links and stable lab IDs", async () => {
+  for (const locale of ["tr", "en"]) {
+    const dashboard = await readExportedPage(locale);
+    for (const code of ["aia", "adp", "llm", "evl", "lcl"]) {
+      assert.ok(dashboard.includes(`href="https://${code}.aserdargun.com/"`));
+    }
+    for (const [surface, prefix, count] of [["labs", "lab-", 8], ["visualize", "viz-", 4]]) {
+      const html = await readExportedPage(`${locale}/${surface}`);
+      const ids = [...html.matchAll(new RegExp(`data-content-id="(${prefix}[^"]+)"`, "g"))].map((match) => match[1]);
+      assert.equal(new Set(ids).size, count);
+    }
+    const evidence = await readExportedPage(`${locale}/evidence`);
+    assert.ok(evidence.includes("2026-08-08"));
+    for (const paper of ["2106.09685", "2305.14314", "1706.03762", "2402.03300"]) assert.ok(evidence.includes(`href="https://arxiv.org/abs/${paper}"`));
   }
 });

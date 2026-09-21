@@ -38,7 +38,7 @@ export function TokenizerPlayground({ locale }: { locale: Locale }) {
   const ratio = enTokens.length > 0 ? (trTokens.length / enTokens.length) : 0;
 
   return (
-    <article className="viz-card viz-card-wide">
+    <article className="viz-card viz-card-wide" data-content-id="viz-tokenizer">
       <div className="viz-head">
         <span className="lab-index">V01</span>
         <div>
@@ -158,7 +158,7 @@ export function VRAMVisualizer({ locale }: { locale: Locale }) {
   const cx = 100, cy = 100, r = 80;
 
   return (
-    <article className="viz-card viz-card-wide">
+    <article className="viz-card viz-card-wide" data-content-id="viz-vram">
       <div className="viz-head">
         <span className="lab-index">V02</span>
         <div>
@@ -299,7 +299,7 @@ export function LossSimulator({ locale }: { locale: Locale }) {
   const valPath = sim.val.map((v, i) => `${i === 0 ? "M" : "L"} ${xScale(i).toFixed(3)} ${yScale(v).toFixed(3)}`).join(" ");
 
   return (
-    <article className="viz-card viz-card-wide">
+    <article className="viz-card viz-card-wide" data-content-id="viz-loss">
       <div className="viz-head">
         <span className="lab-index">V03</span>
         <div>
@@ -399,7 +399,7 @@ export function AttentionHeatmap({ locale }: { locale: Locale }) {
   })();
 
   return (
-    <article className="viz-card viz-card-wide">
+    <article className="viz-card viz-card-wide" data-content-id="viz-attention">
       <div className="viz-head">
         <span className="lab-index">V04</span>
         <div>

@@ -9,7 +9,7 @@ const root = new URL("../", import.meta.url);
 
 test("all lesson records carry the current verification date", () => {
   for (const lesson of [...lessons.tr, ...lessons.en]) {
-    assert.equal(lesson.verifiedAt, "2026-09-04", `${lesson.locale}/${lesson.slug}`);
+    assert.equal(lesson.verifiedAt, "2026-09-21", `${lesson.locale}/${lesson.slug}`);
   }
 });
 
