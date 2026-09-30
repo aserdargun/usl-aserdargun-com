@@ -97,7 +97,8 @@
       "surface-data-evaluation",
       "surface-journey",
       "surface-visualize",
-      "surface-flashcards"
+      "surface-flashcards",
+      "surface-glossary"
     ],
     "en": [
       "models",
@@ -194,14 +195,15 @@
       "surface-data-evaluation",
       "surface-journey",
       "surface-visualize",
-      "surface-flashcards"
+      "surface-flashcards",
+      "surface-glossary"
     ]
   },
   "stale": [],
   "sourceDigest": "5eef874fcca090f2491894df46cdb8bb62dbd0eebbd88370805f95fb532e0b0a",
   "reviewedAt": "2026-09-21",
   "reviewedContentDigests": {
-    "tr": "1a6d024d762892e0bc97c167f731288b0dd609a86c8809f64ca20a647de24abb",
-    "en": "afa2875de4209baf3671bcb86b915699340ba7bf2762692ff45eef6cce044491"
+    "tr": "ab0acb2ad28aa68ffe8a6ee9e2983606a6589d43304a5b63ba6f86b90550368f",
+    "en": "263fe5e2121586d4f1cd6ab2adb027dd3aa834f1bc8b009d207d57f9c5574e2f"
   }
 }

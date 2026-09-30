@@ -3,8 +3,8 @@ import { lessons, type Locale, type Surface } from "./atlas-data";
 
 const origin = "https://usl.aserdargun.com";
 const surfaceTitles: Record<Locale, Record<Surface, string>> = {
-  tr: { dashboard: "Panel", roadmap: "12 Haftalık Yol Haritası", labs: "Etkileşimli Laboratuvarlar", evidence: "Deney ve Kanıt Kaydı", "data-evaluation": "Veri ve Değerlendirme", journey: "Öğrenme Yolculuğu", visualize: "Görsel ve Etkileşimli Laboratuvar", flashcards: "Aralıklı Tekrar Kartları" },
-  en: { dashboard: "Dashboard", roadmap: "12-Week Roadmap", labs: "Interactive Labs", evidence: "Experiment and Evidence Record", "data-evaluation": "Data and Evaluation", journey: "Learning Journey", visualize: "Visual and Interactive Lab", flashcards: "Spaced Repetition Cards" },
+  tr: { dashboard: "Panel", roadmap: "12 Haftalık Yol Haritası", labs: "Etkileşimli Laboratuvarlar", evidence: "Deney ve Kanıt Kaydı", "data-evaluation": "Veri ve Değerlendirme", journey: "Öğrenme Yolculuğu", visualize: "Görsel ve Etkileşimli Laboratuvar", flashcards: "Aralıklı Tekrar Kartları", glossary: "Terimler Sözlüğü" },
+  en: { dashboard: "Dashboard", roadmap: "12-Week Roadmap", labs: "Interactive Labs", evidence: "Experiment and Evidence Record", "data-evaluation": "Data and Evaluation", journey: "Learning Journey", visualize: "Visual and Interactive Lab", flashcards: "Spaced Repetition Cards", glossary: "Term Glossary" },
 };
 
 export function atlasMetadata(locale: Locale, surface: Surface = "dashboard", slug?: string): Metadata {

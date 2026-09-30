@@ -1,6 +1,6 @@
 export type Locale = "tr" | "en";
 export type EvidenceLevel = "verified" | "observed" | "planned" | "unknown" | "simulation";
-export type Surface = "dashboard" | "roadmap" | "labs" | "evidence" | "data-evaluation" | "journey" | "visualize" | "flashcards";
+export type Surface = "dashboard" | "roadmap" | "labs" | "evidence" | "data-evaluation" | "journey" | "visualize" | "flashcards" | "glossary";
 
 export interface ContentRecord {
   id: string;
@@ -70,7 +70,7 @@ export const ui = {
     skip: "İçeriğe geç",
     brand: "Unsloth Studio Learning",
     brandTag: "kanıt odaklı öğrenme atlası",
-    nav: { dashboard: "Panel", roadmap: "12 Hafta", learn: "Öğren", labs: "Laboratuvar", evidence: "Kanıt", data: "Veri ve Değerlendirme", journey: "Yolculuk", visualize: "Görselleştir", flashcards: "Kartlar" },
+    nav: { dashboard: "Panel", roadmap: "12 Hafta", learn: "Öğren", labs: "Laboratuvar", evidence: "Kanıt", data: "Veri ve Değerlendirme", journey: "Yolculuk", visualize: "Görselleştir", flashcards: "Kartlar", glossary: "Sözlük" },
     language: "English",
     theme: "Temayı değiştir",
     sourceState: "Kaynak durumu",
@@ -102,7 +102,7 @@ export const ui = {
     skip: "Skip to content",
     brand: "Unsloth Studio Learning",
     brandTag: "evidence-aware learning atlas",
-    nav: { dashboard: "Dashboard", roadmap: "12 Weeks", learn: "Learn", labs: "Labs", evidence: "Evidence", data: "Data & Eval", journey: "Journey", visualize: "Visualize", flashcards: "Flashcards" },
+    nav: { dashboard: "Dashboard", roadmap: "12 Weeks", learn: "Learn", labs: "Labs", evidence: "Evidence", data: "Data & Eval", journey: "Journey", visualize: "Visualize", flashcards: "Flashcards", glossary: "Glossary" },
     language: "Türkçe",
     theme: "Change theme",
     sourceState: "Source state",
@@ -249,7 +249,7 @@ export const evidenceLabels: Record<Locale, Record<EvidenceLevel, string>> = {
   en: { verified: "Verified", observed: "Observed", planned: "Planned", unknown: "Unknown", simulation: "Simulation" },
 };
 
-export const routeSurfaces: Surface[] = ["roadmap", "labs", "evidence", "data-evaluation", "journey", "visualize", "flashcards"];
+export const routeSurfaces: Surface[] = ["roadmap", "labs", "evidence", "data-evaluation", "journey", "visualize", "flashcards", "glossary"];
 
 // ---------------------------------------------------------------------------
 // Öğrenci destek katmanı: glossary (tooltip sözlük) + kavram haritası.

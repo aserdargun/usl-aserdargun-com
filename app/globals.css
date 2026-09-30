@@ -805,3 +805,24 @@ footer a:hover { color: var(--orange); }
 .portfolio-pathways .lesson-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); }
 .portfolio-pathways .lesson-tile { min-height: 210px; }
 @media (max-width: 600px) { .portfolio-pathways .section-heading { flex-direction: column; } }
+
+/* Glossary surface: makes every term reachable, not only the tooltip-linked ones. */
+.glossary-page { max-width: 860px; }
+.glossary-page h1 { margin: 0 0 8px; }
+.glossary-search { display: grid; gap: 6px; margin: 24px 0 12px; max-width: 380px; }
+.glossary-search span { color: var(--muted); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.glossary-search input { padding: 9px 11px; border: 1px solid var(--line, #cfd6e0); border-radius: 6px; background: var(--surface, #fff); color: inherit; font: inherit; }
+.glossary-count { margin: 0 0 8px; color: var(--muted); font: 11px var(--mono, monospace); }
+.glossary-list { display: grid; gap: 0; margin: 0; }
+.glossary-entry { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 16px 28px; padding: 16px 0; border-top: 1px solid var(--line, #cfd6e0); }
+.glossary-entry dt { display: grid; gap: 4px; align-content: start; }
+.glossary-entry dt b { font-size: 15px; }
+.glossary-entry dt code { color: var(--muted); font-size: 11px; }
+.glossary-entry dd { margin: 0; display: grid; gap: 6px; }
+.glossary-entry dd p { margin: 0; }
+.glossary-short { font-weight: 600; }
+.glossary-empty { margin-top: 20px; color: var(--muted); }
+.roadmap-status { margin: 12px 0 0; color: var(--muted); font-size: 13px; }
+@media (max-width: 640px) {
+  .glossary-entry { grid-template-columns: 1fr; gap: 8px; }
+}
