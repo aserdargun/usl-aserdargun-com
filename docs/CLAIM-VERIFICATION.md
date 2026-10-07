@@ -1,6 +1,6 @@
 # Version-sensitive claim verification
 
-Last verified: **2026-10-02**
+Last verified: **2026-10-07**
 
 The application deliberately avoids presenting a planning calculator as a real training run. The following product claims were rechecked against first-party documentation for this release:
 
@@ -11,7 +11,7 @@ The application deliberately avoids presenting a planning calculator as a real t
 | QLoRA uses a quantized frozen base plus trainable adapters | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The hyperparameters guide states QLoRA is 4-bit fine-tuning using much less VRAM (4× less than 16-bit LoRA) and that 4-bit precision reduces VRAM by over 75%. This expands feasible configurations but does not guarantee that a model/context/batch fits 16 GB. |
 | Context length, batch size, gradient accumulation, and checkpointing are memory/performance controls | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The guide gives `Effective Batch Size = batch_size × gradient_accumulation_steps` and describes batch size as the primary driver of VRAM use and gradient accumulation as the primary driver of training time. The 4070 Ti Super card is explicitly a planning simulation until measured on hardware. |
 | Azure static Next.js deployment uses `output: "export"` and `out/` | [Azure Static Web Apps Next.js documentation](https://learn.microsoft.com/en-us/azure/static-web-apps/nextjs). The page specifies `output: 'export'` in `next.config.js`, `out` as the default `output_location`, and `IS_STATIC_EXPORT: true` for custom build scripts. This repository enables it only through `IS_STATIC_EXPORT=true`; Vinext uses its normal worker build. |
-| Unsloth release status used during this review | [Unsloth v0.1.902-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.902-beta), published 2026-10-01, titled "Command Palette + Desktop UI/UX". It keeps NVFP4, INT4 and MXFP4 checkpoints packed in 4-bit during LoRA training, and reports Laya decision models up to 4.1× faster. This is release context only; neither the speed figure nor the memory figures generalize to other models, hardware or workloads, and this atlas runs no training. |
+| Unsloth release status used during this review | [Unsloth v0.1.904-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.904-beta), published 2026-10-07, titled "Decision Model Creation". It turns a text or vision LLM into a decision model with reported accuracy rising from 30% to 80%, loads ComfyUI diffusion models natively, and reports training Qwen3.5-35B-A3B up to 4.1× faster and Qwen3.5-30B-A3B up to 3.3× faster with QLoRA on A100 and RTX PRO 6000. Two releases have landed since the previous review: v0.1.903-beta on 2026-10-06, "New Browser + Voice Cloning", and this one. The earlier v0.1.902-beta of 2026-10-01, "Command Palette + Desktop UI/UX", is no longer the tip. This is release context only; neither the accuracy figure nor the speed figures generalize to other models, hardware or workloads, and this atlas runs no training. |
 
 Reverification rule: whenever the Turkish source digest changes or a version-sensitive product claim changes, update this date, re-check first-party documentation, and keep `content/locale-parity.json.stale` empty before release.
 
