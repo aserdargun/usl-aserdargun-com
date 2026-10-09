@@ -1,6 +1,6 @@
 # Version-sensitive claim verification
 
-Last verified: **2026-10-07**
+Last verified: **2026-10-09**
 
 The application deliberately avoids presenting a planning calculator as a real training run. The following product claims were rechecked against first-party documentation for this release:
 
@@ -11,7 +11,7 @@ The application deliberately avoids presenting a planning calculator as a real t
 | QLoRA uses a quantized frozen base plus trainable adapters | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The hyperparameters guide states QLoRA is 4-bit fine-tuning using much less VRAM (4× less than 16-bit LoRA) and that 4-bit precision reduces VRAM by over 75%. This expands feasible configurations but does not guarantee that a model/context/batch fits 16 GB. |
 | Context length, batch size, gradient accumulation, and checkpointing are memory/performance controls | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The guide gives `Effective Batch Size = batch_size × gradient_accumulation_steps` and describes batch size as the primary driver of VRAM use and gradient accumulation as the primary driver of training time. The 4070 Ti Super card is explicitly a planning simulation until measured on hardware. |
 | Azure static Next.js deployment uses `output: "export"` and `out/` | [Azure Static Web Apps Next.js documentation](https://learn.microsoft.com/en-us/azure/static-web-apps/nextjs). The page specifies `output: 'export'` in `next.config.js`, `out` as the default `output_location`, and `IS_STATIC_EXPORT: true` for custom build scripts. This repository enables it only through `IS_STATIC_EXPORT=true`; Vinext uses its normal worker build. |
-| Unsloth release status used during this review | [Unsloth v0.1.904-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.904-beta), published 2026-10-07, titled "Decision Model Creation". It turns a text or vision LLM into a decision model with reported accuracy rising from 30% to 80%, loads ComfyUI diffusion models natively, and reports training Qwen3.5-35B-A3B up to 4.1× faster and Qwen3.5-30B-A3B up to 3.3× faster with QLoRA on A100 and RTX PRO 6000. Two releases have landed since the previous review: v0.1.903-beta on 2026-10-06, "New Browser + Voice Cloning", and this one. The earlier v0.1.902-beta of 2026-10-01, "Command Palette + Desktop UI/UX", is no longer the tip. This is release context only; neither the accuracy figure nor the speed figures generalize to other models, hardware or workloads, and this atlas runs no training. |
+| Unsloth release status used during this review | [Unsloth v0.1.905-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.905-beta), published 2026-10-08, titled "Sandboxing is here!". It introduces sandboxing across the three desktop platforms — Bwrap on Linux, Seatbelt on Mac and MXC on Windows — documented in the [sandboxing guide](https://unsloth.ai/docs/new/studio/sandboxing-in-unsloth), and it keeps the decision-model line that arrived one day earlier: a text or vision LLM becomes a Jev-style decision model with reported accuracy rising from 30% to 80%, trained with QLoRA, tested through the Decision API, exported as Clef or Laya models to GGUF and served through llama.cpp, per the [decision-model guide](https://unsloth.ai/docs/basics/train-your-own-decision-model-with-unsloth). It also loads ComfyUI diffusion models natively, adds INT8 ConvRot for faster and more accurate diffusion, and bundles a better Desktop Browser with 100+ bug and performance fixes. One release has landed since the previous review, this one; v0.1.904-beta of 2026-10-07 is no longer the tip. This is release context only; neither the accuracy figure nor any speed figure generalizes to other models, hardware or workloads, and this atlas runs no training. |
 
 Reverification rule: whenever the Turkish source digest changes or a version-sensitive product claim changes, update this date, re-check first-party documentation, and keep `content/locale-parity.json.stale` empty before release.
 
@@ -79,3 +79,33 @@ calculator and flashcard behavior versions are unchanged, no lesson or locale
 content was edited, and the portfolio research cutoff is unchanged at its
 existing value because this review moved a pinned version reference, not the
 evidence base.
+
+## Version-sensitive recheck — 2026-10-09
+
+Every row in the table above was re-read against first-party documentation on
+9 October 2026. All six claims still hold. The pinned Unsloth release moved from
+v0.1.904-beta (2026-10-07) to v0.1.905-beta (2026-10-08), and that release is
+now the one cited above.
+
+One boundary in that release is worth stating here, because it is a property of
+the tool and not of the learner's hardware. Unsloth now sandboxes its runs with
+Bwrap on Linux, Seatbelt on Mac and MXC on Windows. That is a containment
+boundary around the tool's own execution, and it does not change any LoRA,
+QLoRA or VRAM claim recorded above. A reader should not read it as a guarantee
+that a training job is reproducible across those three platforms, nor as a
+measurement of anything; the atlas records it as release context.
+
+The decision-model material that arrived with v0.1.904-beta is carried forward
+rather than restated as new: the 30% to 80% figure is still the vendor's own
+reported number for a Jev-style decision model, and it is recorded here with
+the same boundary as before. The ComfyUI and diffusion work is upstream of
+anything this atlas teaches.
+
+This recheck read release metadata and documentation. It is not a training run,
+not a hardware measurement, and not a reproduction of any published result. The
+calculator and flashcard behavior versions are unchanged, no lesson or locale
+content was edited, so `content/locale-parity.json` keeps its existing
+`reviewedAt` of 2026-09-21 and an empty `stale` array; the evidence ledger and
+the bilingual content review are separate contracts and only the first one
+moved. The portfolio research cutoff is unchanged at its existing value because
+this review moved a pinned version reference, not the evidence base.
