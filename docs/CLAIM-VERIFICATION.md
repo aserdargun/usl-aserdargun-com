@@ -1,6 +1,6 @@
 # Version-sensitive claim verification
 
-Last verified: **2026-10-13**
+Last verified: **2026-10-15**
 
 The application deliberately avoids presenting a planning calculator as a real training run. The following product claims were rechecked against first-party documentation for this release:
 
@@ -11,7 +11,7 @@ The application deliberately avoids presenting a planning calculator as a real t
 | QLoRA uses a quantized frozen base plus trainable adapters | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The hyperparameters guide states QLoRA is 4-bit fine-tuning using much less VRAM (4× less than 16-bit LoRA) and that 4-bit precision reduces VRAM by over 75%. This expands feasible configurations but does not guarantee that a model/context/batch fits 16 GB. |
 | Context length, batch size, gradient accumulation, and checkpointing are memory/performance controls | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The guide gives `Effective Batch Size = batch_size × gradient_accumulation_steps` and describes batch size as the primary driver of VRAM use and gradient accumulation as the primary driver of training time. The 4070 Ti Super card is explicitly a planning simulation until measured on hardware. |
 | Azure static Next.js deployment uses `output: "export"` and `out/` | [Azure Static Web Apps Next.js documentation](https://learn.microsoft.com/en-us/azure/static-web-apps/nextjs). The page specifies `output: 'export'` in `next.config.js`, `out` as the default `output_location`, and `IS_STATIC_EXPORT: true` for custom build scripts. This repository enables it only through `IS_STATIC_EXPORT=true`; Vinext uses its normal worker build. |
-| Unsloth release status used during this review | [Unsloth v0.1.906-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.906-beta), published 2026-10-12, titled "Browser Use + Qwen-Image-2.1-Turbo". Local models can now drive the Unsloth Browser — opening pages, reading, clicking, typing and scrolling in a tab beside the chat with no access to other tabs — with Unsloth asking before any sign-in, form submission or purchase and the model never filling in passwords, card numbers or one-time codes; it also ships Qwen-Image-2.1-Turbo as an 8-step image model, text-diffusion LLM training via `DiffusionTrainer` (DiffusionGemma, LLaDA, Dream and others), up to 3x faster MoE GGUFs larger than VRAM, and speculative decoding on Mac. One release has landed since the previous review, this one; v0.1.905-beta of 2026-10-08 is no longer the tip. That earlier release's sandboxing material is not retracted here — Bwrap on Linux, Seatbelt on Mac and MXC on Windows remain as documented in the [sandboxing guide](https://unsloth.ai/docs/new/studio/sandboxing-in-unsloth) — and neither release changes the LoRA, rsLoRA or QLoRA claims above, whose first-party documentation was re-read for this pass and is unchanged. The reported 2.5x, 3x and 2.8x figures are the release notes' own and are specific to the named models, hardware and workloads. This is release context only; neither the accuracy figure nor any speed figure generalizes to other models, hardware or workloads, and this atlas runs no training. |
+| Unsloth release status used during this review | [Unsloth v0.1.907-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.907-beta), published 2026-10-13 at 16:02:04Z, titled "Large Performance Gains + More Browser Use". It reports up to 10x faster Unsloth UI/UX for multiple chats, up to 5x faster inference from a 95% cache hit rate plus MoE Strata and slowdown fixes, better compaction across all APIs, drag-and-drop files in Desktop with 3x more supported file types, and browser use extended from click-and-type to click at a point, move the mouse, drag unlabelled targets such as canvases, run approved scripts each time, and set per-site rules for unlabelled clicks. It also adds LTX-2.5 text-to-video and image-to-video with Wan2.2-TI2V-5B, fused AdamW and aspect-ratio buckets for image LoRA training with improved FP8/MXFP8 support, NVIDIA RTX Spark Windows ARM64 downloads, `/rewind` and `/compact` in saved chats, documents up to 200 MB in the web UI, MCP access for coding agents, and fixes for Windows AMD Triton startup, Intel XPU native BF16 and low-VRAM Gemma 4 E2B loading. One release has landed since the previous review, this one; v0.1.906-beta of 2026-10-12 is no longer the tip, and its Browser Use and Qwen-Image-2.1-Turbo material is not retracted — the sandboxing guidance from v0.1.905-beta still stands as documented in the [sandboxing guide](https://unsloth.ai/docs/new/studio/sandboxing-in-unsloth). The LoRA, rsLoRA and QLoRA claims above are unchanged; their first-party documentation was re-read for this pass. Every performance figure here is the release notes' own and is specific to the named models, hardware, workloads and Unsloth's own implementation; none of it generalizes to other models or hardware, and this atlas runs no training. |
 
 Reverification rule: whenever the Turkish source digest changes or a version-sensitive product claim changes, update this date, re-check first-party documentation, and keep `content/locale-parity.json.stale` empty before release.
 
@@ -109,3 +109,31 @@ content was edited, so `content/locale-parity.json` keeps its existing
 the bilingual content review are separate contracts and only the first one
 moved. The portfolio research cutoff is unchanged at its existing value because
 this review moved a pinned version reference, not the evidence base.
+
+## Version-sensitive recheck — 2026-10-15
+
+Every row in the table above was re-read against first-party documentation on
+15 October 2026. All six claims still hold. The pinned Unsloth release moved from
+v0.1.906-beta (2026-10-12) to v0.1.907-beta (2026-10-13, 16:02:04Z), and that
+release is now the one cited above.
+
+That release is overwhelmingly a performance and browser-surface release, and its
+numbers are worth fencing. Up to 10x faster UI for multiple chats, up to 5x faster
+inference, 3x more supported file types and the 200 MB document ceiling are all
+the release notes' own claims about Unsloth's own implementation on the hardware
+and workloads they name. None of them is a training result, none is a measurement
+this atlas took, and none carries over to another model, card or runtime. The
+browser additions — click at a point, move the mouse, drag unlabelled targets such
+as canvases, run approved scripts per invocation, set per-site rules for unlabelled
+clicks — extend what the model may operate on. They remain release context about a
+tool's capability surface; they do not make any statement about the learner's
+hardware or about reproducibility across platforms, and the v0.1.905-beta sandboxing
+boundary recorded in the 9 October section still stands unchanged.
+
+The LoRA, rsLoRA and QLoRA documentation pages were re-read for this pass and are
+unchanged, so no equation, no memory formula and no calculator behaviour moved.
+As on 2026-10-09, `content/locale-parity.json` keeps its existing `reviewedAt` of
+2026-09-21 and an empty `stale` array: no lesson or locale content was edited, and
+the evidence ledger and the bilingual content review are separate contracts of
+which only the first moved. The portfolio research cutoff is likewise unchanged,
+because this review moved a pinned version reference rather than the evidence base.
