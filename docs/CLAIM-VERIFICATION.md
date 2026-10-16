@@ -1,6 +1,6 @@
 # Version-sensitive claim verification
 
-Last verified: **2026-10-15**
+Last verified: **2026-10-16**
 
 The application deliberately avoids presenting a planning calculator as a real training run. The following product claims were rechecked against first-party documentation for this release:
 
@@ -11,7 +11,7 @@ The application deliberately avoids presenting a planning calculator as a real t
 | QLoRA uses a quantized frozen base plus trainable adapters | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The hyperparameters guide states QLoRA is 4-bit fine-tuning using much less VRAM (4× less than 16-bit LoRA) and that 4-bit precision reduces VRAM by over 75%. This expands feasible configurations but does not guarantee that a model/context/batch fits 16 GB. |
 | Context length, batch size, gradient accumulation, and checkpointing are memory/performance controls | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The guide gives `Effective Batch Size = batch_size × gradient_accumulation_steps` and describes batch size as the primary driver of VRAM use and gradient accumulation as the primary driver of training time. The 4070 Ti Super card is explicitly a planning simulation until measured on hardware. |
 | Azure static Next.js deployment uses `output: "export"` and `out/` | [Azure Static Web Apps Next.js documentation](https://learn.microsoft.com/en-us/azure/static-web-apps/nextjs). The page specifies `output: 'export'` in `next.config.js`, `out` as the default `output_location`, and `IS_STATIC_EXPORT: true` for custom build scripts. This repository enables it only through `IS_STATIC_EXPORT=true`; Vinext uses its normal worker build. |
-| Unsloth release status used during this review | [Unsloth v0.1.907-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.907-beta), published 2026-10-13 at 16:02:04Z, titled "Large Performance Gains + More Browser Use". It reports up to 10x faster Unsloth UI/UX for multiple chats, up to 5x faster inference from a 95% cache hit rate plus MoE Strata and slowdown fixes, better compaction across all APIs, drag-and-drop files in Desktop with 3x more supported file types, and browser use extended from click-and-type to click at a point, move the mouse, drag unlabelled targets such as canvases, run approved scripts each time, and set per-site rules for unlabelled clicks. It also adds LTX-2.5 text-to-video and image-to-video with Wan2.2-TI2V-5B, fused AdamW and aspect-ratio buckets for image LoRA training with improved FP8/MXFP8 support, NVIDIA RTX Spark Windows ARM64 downloads, `/rewind` and `/compact` in saved chats, documents up to 200 MB in the web UI, MCP access for coding agents, and fixes for Windows AMD Triton startup, Intel XPU native BF16 and low-VRAM Gemma 4 E2B loading. One release has landed since the previous review, this one; v0.1.906-beta of 2026-10-12 is no longer the tip, and its Browser Use and Qwen-Image-2.1-Turbo material is not retracted — the sandboxing guidance from v0.1.905-beta still stands as documented in the [sandboxing guide](https://unsloth.ai/docs/new/studio/sandboxing-in-unsloth). The LoRA, rsLoRA and QLoRA claims above are unchanged; their first-party documentation was re-read for this pass. Every performance figure here is the release notes' own and is specific to the named models, hardware, workloads and Unsloth's own implementation; none of it generalizes to other models or hardware, and this atlas runs no training. |
+| Unsloth release status used during this review | [Unsloth v0.1.908-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.908-beta), published 2026-10-15 at 18:50:55Z, titled "NVIDIA Nemotron 3.5 + Meta Muse Spark Open". It reports NVIDIA Nemotron 3.5 Bolt (74B, 9B active, 128K context, about 32 GB at 1-bit or 2-bit), Nemotron 3.5 Super VL (120B, 12B active, up to 1M tokens of context, about 64 GB at 1-bit or 128 GB at 4-bit) and Meta Muse Spark Open (816B MoE, about 42.7B active, 1M tokens of context, about 256 GB at 2-bit, text/image/video/audio input). It also adds text-diffusion LLMs (LLaDA, Dream, SDAR, LLaDA2, Nemotron-Labs-Diffusion, DiffusionGemma) with a live denoising canvas, DeepSpeed ZeRO-2/ZeRO-3 training including 4-bit QLoRA and DPO, better prompt caching for coding agents (a new Claude Code session's first reply starts up to 4x sooner), and Python `model.generate` up to 2.7x faster at 32K context for Llama and Qwen3 models. One release has landed since the previous review, this one; v0.1.907-beta of 2026-10-13 is no longer the tip, and its Browser Use material is not retracted — the sandboxing guidance from v0.1.905-beta still stands as documented in the [sandboxing guide](https://unsloth.ai/docs/new/studio/sandboxing-in-unsloth). The LoRA, rsLoRA and QLoRA claims above are unchanged; their first-party documentation was re-read for this pass. Every memory and performance figure here is the release notes' own and is specific to the named models, hardware and Unsloth's own implementation; none of it generalizes to other models or hardware, none is a training result this atlas produced, and it says nothing about the learner's own card. |
 
 Reverification rule: whenever the Turkish source digest changes or a version-sensitive product claim changes, update this date, re-check first-party documentation, and keep `content/locale-parity.json.stale` empty before release.
 
@@ -137,3 +137,38 @@ As on 2026-10-09, `content/locale-parity.json` keeps its existing `reviewedAt` o
 the evidence ledger and the bilingual content review are separate contracts of
 which only the first moved. The portfolio research cutoff is likewise unchanged,
 because this review moved a pinned version reference rather than the evidence base.
+
+## Version-sensitive recheck — 2026-10-16
+
+Every row in the table above was re-read against first-party documentation on
+16 October 2026. All six claims still hold. The pinned Unsloth release moved from
+v0.1.907-beta (2026-10-13, 16:02:04Z) to v0.1.908-beta (2026-10-15, 18:50:55Z),
+and that release is now the one cited above.
+
+This release is a model-support release rather than a training-method release, and
+that distinction is the point worth keeping. Its headline numbers are memory and
+fit figures attached to named checkpoints: Nemotron 3.5 Bolt at about 32 GB,
+Nemotron 3.5 Super VL at about 64 GB at 1-bit or 128 GB at 4-bit, and Muse Spark
+Open at about 256 GB at 2-bit. They describe Unsloth running those specific
+models on the hardware Unsloth measured. They are not the 16 GB fit this atlas
+plans against, they are not a result this atlas reproduced, and they do not lower
+the VRAM figures the calculator teaches — that teaching model still excludes
+quantization metadata, runtime workspaces and allocator overhead, so a budget the
+calculator calls feasible remains unproven until it is measured on the card.
+
+The training additions — text-diffusion LLM families, DeepSpeed ZeRO-2/ZeRO-3 with
+4-bit QLoRA and DPO — are upstream of anything this atlas teaches, and the LoRA,
+rsLoRA and QLoRA rows above are unchanged by them. The prompt-caching and
+`model.generate` speedups are the release notes' own claims about Unsloth's own
+runtime on the models they name; as before, none of them generalizes to another
+model, card or runtime, and the v0.1.905-beta sandboxing boundary recorded in the
+9 October section still stands unchanged.
+
+The LoRA, rsLoRA and QLoRA documentation pages were re-read for this pass and are
+unchanged, so no equation, no memory formula and no calculator behaviour moved.
+As on 2026-10-09 and 2026-10-15, `content/locale-parity.json` keeps its existing
+`reviewedAt` of 2026-09-21 and an empty `stale` array: no lesson or locale content
+was edited, and the evidence ledger and the bilingual content review are separate
+contracts of which only the first moved. The portfolio research cutoff is likewise
+unchanged, because this review moved a pinned version reference rather than the
+evidence base.
