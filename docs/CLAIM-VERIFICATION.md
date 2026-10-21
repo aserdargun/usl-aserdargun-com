@@ -1,6 +1,6 @@
 # Version-sensitive claim verification
 
-Last verified: **2026-10-16**
+Last verified: **2026-10-21**
 
 The application deliberately avoids presenting a planning calculator as a real training run. The following product claims were rechecked against first-party documentation for this release:
 
@@ -11,7 +11,7 @@ The application deliberately avoids presenting a planning calculator as a real t
 | QLoRA uses a quantized frozen base plus trainable adapters | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The hyperparameters guide states QLoRA is 4-bit fine-tuning using much less VRAM (4× less than 16-bit LoRA) and that 4-bit precision reduces VRAM by over 75%. This expands feasible configurations but does not guarantee that a model/context/batch fits 16 GB. |
 | Context length, batch size, gradient accumulation, and checkpointing are memory/performance controls | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The guide gives `Effective Batch Size = batch_size × gradient_accumulation_steps` and describes batch size as the primary driver of VRAM use and gradient accumulation as the primary driver of training time. The 4070 Ti Super card is explicitly a planning simulation until measured on hardware. |
 | Azure static Next.js deployment uses `output: "export"` and `out/` | [Azure Static Web Apps Next.js documentation](https://learn.microsoft.com/en-us/azure/static-web-apps/nextjs). The page specifies `output: 'export'` in `next.config.js`, `out` as the default `output_location`, and `IS_STATIC_EXPORT: true` for custom build scripts. This repository enables it only through `IS_STATIC_EXPORT=true`; Vinext uses its normal worker build. |
-| Unsloth release status used during this review | [Unsloth v0.1.908-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.908-beta), published 2026-10-15 at 18:50:55Z, titled "NVIDIA Nemotron 3.5 + Meta Muse Spark Open". It reports NVIDIA Nemotron 3.5 Bolt (74B, 9B active, 128K context, about 32 GB at 1-bit or 2-bit), Nemotron 3.5 Super VL (120B, 12B active, up to 1M tokens of context, about 64 GB at 1-bit or 128 GB at 4-bit) and Meta Muse Spark Open (816B MoE, about 42.7B active, 1M tokens of context, about 256 GB at 2-bit, text/image/video/audio input). It also adds text-diffusion LLMs (LLaDA, Dream, SDAR, LLaDA2, Nemotron-Labs-Diffusion, DiffusionGemma) with a live denoising canvas, DeepSpeed ZeRO-2/ZeRO-3 training including 4-bit QLoRA and DPO, better prompt caching for coding agents (a new Claude Code session's first reply starts up to 4x sooner), and Python `model.generate` up to 2.7x faster at 32K context for Llama and Qwen3 models. One release has landed since the previous review, this one; v0.1.907-beta of 2026-10-13 is no longer the tip, and its Browser Use material is not retracted — the sandboxing guidance from v0.1.905-beta still stands as documented in the [sandboxing guide](https://unsloth.ai/docs/new/studio/sandboxing-in-unsloth). The LoRA, rsLoRA and QLoRA claims above are unchanged; their first-party documentation was re-read for this pass. Every memory and performance figure here is the release notes' own and is specific to the named models, hardware and Unsloth's own implementation; none of it generalizes to other models or hardware, none is a training result this atlas produced, and it says nothing about the learner's own card. |
+| Unsloth release status used during this review | [Unsloth v0.1.909-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.909-beta), published 2026-10-19 at 16:21:58Z, titled "DeepSeek-V4.1 & FLUX-3". It reports DeepSeek-V4.1-Flash-1017 (552B parameters plus 196B in its Engram table, about 16B active, 1M tokens of context; with the Engram table left on SSD it runs in about 125 GB at 1-bit or 300 GB at 4-bit, and it scores 42.3 on Terminal-Bench 4.0 against 31.2 for the earlier DeepSeek-V4.1-Flash) and Black Forest Labs FLUX.3 Image Klein (5.6B, 24 GB of GPU memory, editing with up to 10 reference images). It also adds alpha multi-GPU training with FSDP2 for LoRA, QLoRA and full fine-tuning plus `context_parallel_size` for long sequences, a token preview that shows which parts of a dataset the model trains on, `unsloth mcp add` for connecting Claude Code, Codex or Cursor to Unsloth, and images and videos in local chat. One release has landed since the previous review, this one; v0.1.908-beta of 2026-10-15 is no longer the tip, and its material is not retracted — the sandboxing guidance from v0.1.905-beta still stands as documented in the [sandboxing guide](https://unsloth.ai/docs/new/studio/sandboxing-in-unsloth). The LoRA, rsLoRA and QLoRA claims above are unchanged; their first-party documentation was re-read for this pass. Every memory, benchmark and performance figure here is the release notes' own and is specific to the named models, hardware and Unsloth's own implementation; none of it generalizes to other models or hardware, none is a training result this atlas produced, and it says nothing about the learner's own card. |
 
 Reverification rule: whenever the Turkish source digest changes or a version-sensitive product claim changes, update this date, re-check first-party documentation, and keep `content/locale-parity.json.stale` empty before release.
 
@@ -172,3 +172,79 @@ was edited, and the evidence ledger and the bilingual content review are separat
 contracts of which only the first moved. The portfolio research cutoff is likewise
 unchanged, because this review moved a pinned version reference rather than the
 evidence base.
+
+## Version-sensitive recheck — 2026-10-20
+
+Every row in the table above was re-read against first-party documentation on
+20 October 2026. All six claims still hold. The pinned Unsloth release moved from
+v0.1.908-beta (2026-10-15, 18:50:55Z) to v0.1.909-beta (2026-10-19, 16:21:58Z),
+and that release is now the one cited above.
+
+This one is not only a model-support release. It also carries the first alpha
+multi-GPU training path seen from Unsloth: FSDP2 for spreading LoRA, QLoRA and
+full fine-tuning across GPUs, and `context_parallel_size` for splitting long
+sequences including packed ones. The alpha label is the boundary worth keeping.
+It is a preview path, not a supported configuration, and it does not change the
+single-card teaching model this atlas plans against.
+
+The headline numbers are again memory and fit figures attached to named
+checkpoints: DeepSeek-V4.1-Flash-1017 at about 125 GB at 1-bit with its Engram
+table left on SSD and 300 GB at 4-bit, and FLUX.3 Image Klein on 24 GB of GPU
+memory. They describe Unsloth running those specific models on the hardware
+Unsloth measured. They are not the 16 GB fit this atlas plans against, they are
+not a result this atlas reproduced, and they do not lower the VRAM figures the
+calculator teaches — that teaching model still excludes quantization metadata,
+runtime workspaces and allocator overhead, so a budget the calculator calls
+feasible remains unproven until it is measured on the card. The Terminal-Bench
+4.0 figure of 42.3 against 31.2 for the earlier checkpoint is the release's own
+benchmark on its own checkpoint and does not transfer to another model, card or
+runtime.
+
+The LoRA, rsLoRA and QLoRA documentation pages were re-read for this pass and
+are unchanged, so no equation, no memory formula and no calculator behaviour
+moved. The FSDP2 and `context_parallel_size` additions sit upstream of anything
+this atlas teaches, and the `unsloth mcp add` integration for Claude Code, Codex
+or Cursor is a local tool wiring detail rather than a training claim. The
+v0.1.905-beta sandboxing boundary recorded in the 9 October section still stands
+unchanged.
+
+As on 2026-10-09, 2026-10-15 and 2026-10-16, `content/locale-parity.json` keeps
+its existing `reviewedAt` of 2026-09-21 and an empty `stale` array: no lesson or
+locale content was edited, and the evidence ledger and the bilingual content
+review are separate contracts of which only the first moved. The portfolio
+research cutoff is likewise unchanged, because this review moved a pinned version
+reference rather than the evidence base.
+
+## Version-sensitive recheck — 2026-10-21
+
+Every row in the table above was re-read against first-party documentation on
+21 October 2026. All six claims still hold. The pinned Unsloth release did not
+move: the releases feed still shows v0.1.909-beta (2026-10-19, 16:21:58Z) as the
+tip, so the release cited above is still the current one and no row was rewritten
+on the strength of a version change that did not happen.
+
+The version-sensitive boundary is the same one the previous pass recorded. The
+alpha multi-GPU training path — FSDP2 for spreading LoRA, QLoRA and full
+fine-tuning across GPUs, and `context_parallel_size` for splitting long
+sequences including packed ones — is still labelled alpha in that release, so it
+remains a preview path rather than a supported configuration, and it does not
+change the single-card teaching model this atlas plans against. The headline
+figures stay attached to named checkpoints on Unsloth's own hardware:
+DeepSeek-V4.1-Flash-1017 at about 125 GB at 1-bit with its Engram table left on
+SSD and 300 GB at 4-bit, and FLUX.3 Image Klein on 24 GB of GPU memory. None of
+them is the 16 GB fit this atlas plans against, none is a result this atlas
+reproduced, and none of them lowers the VRAM figures the calculator teaches.
+That teaching model still excludes quantization metadata, runtime workspaces and
+allocator overhead, so a budget the calculator calls feasible remains unproven
+until it is measured on the card. The Terminal-Bench 4.0 figure of 42.3 against
+31.2 for the earlier checkpoint is the release's own benchmark on its own
+checkpoint and does not transfer to another model, card or runtime.
+
+The LoRA, rsLoRA and QLoRA documentation pages were re-read for this pass and
+are unchanged, so no equation, no memory formula and no calculator behaviour
+moved. The `unsloth mcp add` integration for Claude Code, Codex or Cursor
+remains a local tool wiring detail rather than a training claim. The
+v0.1.905-beta sandboxing boundary recorded in the 9 October section still stands
+unchanged. `content/locale-parity.json` keeps its existing 21 September 2026
+review date because no source digest moved on this pass, and its `stale` list
+stays empty.
