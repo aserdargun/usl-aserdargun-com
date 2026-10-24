@@ -1,6 +1,6 @@
 # Version-sensitive claim verification
 
-Last verified: **2026-10-21**
+Last verified: **2026-10-24**
 
 The application deliberately avoids presenting a planning calculator as a real training run. The following product claims were rechecked against first-party documentation for this release:
 
@@ -11,7 +11,7 @@ The application deliberately avoids presenting a planning calculator as a real t
 | QLoRA uses a quantized frozen base plus trainable adapters | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The hyperparameters guide states QLoRA is 4-bit fine-tuning using much less VRAM (4× less than 16-bit LoRA) and that 4-bit precision reduces VRAM by over 75%. This expands feasible configurations but does not guarantee that a model/context/batch fits 16 GB. |
 | Context length, batch size, gradient accumulation, and checkpointing are memory/performance controls | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The guide gives `Effective Batch Size = batch_size × gradient_accumulation_steps` and describes batch size as the primary driver of VRAM use and gradient accumulation as the primary driver of training time. The 4070 Ti Super card is explicitly a planning simulation until measured on hardware. |
 | Azure static Next.js deployment uses `output: "export"` and `out/` | [Azure Static Web Apps Next.js documentation](https://learn.microsoft.com/en-us/azure/static-web-apps/nextjs). The page specifies `output: 'export'` in `next.config.js`, `out` as the default `output_location`, and `IS_STATIC_EXPORT: true` for custom build scripts. This repository enables it only through `IS_STATIC_EXPORT=true`; Vinext uses its normal worker build. |
-| Unsloth release status used during this review | [Unsloth v0.1.909-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.909-beta), published 2026-10-19 at 16:21:58Z, titled "DeepSeek-V4.1 & FLUX-3". It reports DeepSeek-V4.1-Flash-1017 (552B parameters plus 196B in its Engram table, about 16B active, 1M tokens of context; with the Engram table left on SSD it runs in about 125 GB at 1-bit or 300 GB at 4-bit, and it scores 42.3 on Terminal-Bench 4.0 against 31.2 for the earlier DeepSeek-V4.1-Flash) and Black Forest Labs FLUX.3 Image Klein (5.6B, 24 GB of GPU memory, editing with up to 10 reference images). It also adds alpha multi-GPU training with FSDP2 for LoRA, QLoRA and full fine-tuning plus `context_parallel_size` for long sequences, a token preview that shows which parts of a dataset the model trains on, `unsloth mcp add` for connecting Claude Code, Codex or Cursor to Unsloth, and images and videos in local chat. One release has landed since the previous review, this one; v0.1.908-beta of 2026-10-15 is no longer the tip, and its material is not retracted — the sandboxing guidance from v0.1.905-beta still stands as documented in the [sandboxing guide](https://unsloth.ai/docs/new/studio/sandboxing-in-unsloth). The LoRA, rsLoRA and QLoRA claims above are unchanged; their first-party documentation was re-read for this pass. Every memory, benchmark and performance figure here is the release notes' own and is specific to the named models, hardware and Unsloth's own implementation; none of it generalizes to other models or hardware, none is a training result this atlas produced, and it says nothing about the learner's own card. |
+| Unsloth release status used during this review | [Unsloth v0.1.910-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.910-beta), published 2026-10-23 at 15:26:53Z, titled "MOSS-Image, Flint & NVIDIA Bolt E4B". It adds Recursive's Flint, a 40B MoE coding-agent model with 2.5B active parameters and a 256K context, which fits in 24 GB at 3-bit at short contexts and scores 89.7 on SWE-bench Pro v2 against Qwen 3.6's 73.8; OpenMOSS's 5.1B MOSS-Image for English or Chinese text inside images, on 16 GB of GPU memory, in GGUF and FP8; and NVIDIA's Nemotron 3.5 Bolt E4B, a Gemma 4 E4B reasoning tune for tool calling, which scores 63.2 on Tau2-Bench against the original's 38.7. It also lets MLX MoE models too large for memory keep their experts on SSD, so Qwen3.8-Flash-Next runs on a 32 GB Mac; adds a chat-only Unsloth Desktop install that adds training later in Settings; adds MoE expert pruning with REAP, removing 25% or 50% of the least useful experts with `reap_prune` up to 54x faster than llm-compressor's; supports OpenAI's fine-tuning API; and reports DPO and other padded training up to 3.8x faster with less memory on NVIDIA Ampere or newer, attention memory up to 7x smaller on GPUs without bf16, and up to 55% less memory for Parakeet, Canary and CTC speech training. `unsloth train` now also trains vision and, except on Mac, audio models. Two changes tighten security rather than add capability: Unsloth installs, updates and `pip install -U unsloth` now reject eMudhra's compromised emSign certificates, which the release notes say let attackers impersonate websites, while the optional vLLM and SGLang engines still trust them; and a request carrying an Unsloth API key can no longer run Python and terminal tools unsandboxed, only the Unsloth UI can allow that. One release has landed since the previous review, this one; v0.1.909-beta of 2026-10-19 is no longer the tip, and its material is not retracted - the DeepSeek-V4.1-Flash-1017 and FLUX.3 Image Klein figures it reported remain the release's own on its own checkpoints. The LoRA, rsLoRA and QLoRA claims above are unchanged; their first-party documentation was re-read for this pass. Every memory, benchmark and performance figure here is the release notes' own and is specific to the named models, hardware and Unsloth's own implementation; none of it generalizes to other models or hardware, none is a training result this atlas produced, and it says nothing about the learner's own card. |
 
 Reverification rule: whenever the Turkish source digest changes or a version-sensitive product claim changes, update this date, re-check first-party documentation, and keep `content/locale-parity.json.stale` empty before release.
 
@@ -248,3 +248,52 @@ v0.1.905-beta sandboxing boundary recorded in the 9 October section still stands
 unchanged. `content/locale-parity.json` keeps its existing 21 September 2026
 review date because no source digest moved on this pass, and its `stale` list
 stays empty.
+
+## Version-sensitive recheck — 2026-10-24
+
+Every row in the table above was re-read against first-party documentation on
+24 October 2026. All six claims still hold. The pinned Unsloth release did
+move: the releases feed now shows v0.1.910-beta (2026-10-23, 15:26:53Z) as the
+tip, so the release cited above is rewritten around that release, and the
+previous pin, v0.1.909-beta of 19 October, is no longer the tip though its
+material is not retracted.
+
+The version-sensitive boundary is the one the previous pass recorded, measured
+against what this release adds. The release's own change list includes FSDP2
+work - gathering for `push_to_hub`, refusing GGUF and torchao exports, sizing
+offloaded state and per-shard 4-bit counts - but it does not restate the alpha
+label for the alpha multi-GPU training path, so that path remains a preview
+rather than a supported configuration and the single-card teaching model this
+atlas plans against is unchanged. The new headline figures stay attached to
+named checkpoints on Unsloth's own hardware: Flint at 24 GB at 3-bit at short
+contexts, MOSS-Image on 16 GB of GPU memory, and Nemotron 3.5 Bolt E4B on
+Tau2-Bench. None of them is a result this atlas reproduced, and none of them
+lowers the VRAM figures the calculator teaches. The teaching model still
+excludes quantization metadata, runtime workspaces and allocator overhead, so
+a budget the calculator calls feasible remains unproven until it is measured on
+the card. The 89.7 against 73.8 SWE-bench Pro v2 score and the 63.2 against
+38.7 Tau2-Bench score are each the release's own benchmark on its own
+checkpoint and do not transfer to another model, card or runtime. The REAP
+expert-pruning path, the OpenAI-compatible fine-tuning API and the chat-only
+Desktop install are Unsloth product surfaces this atlas does not teach, so no
+row was rewritten for them.
+
+The two security changes are recorded as boundaries rather than as
+capabilities. Unsloth's own install and update path now rejects eMudhra's
+compromised emSign certificates, which the release notes say let attackers
+impersonate websites, while the optional vLLM and SGLang engines still trust
+them; this atlas teaches a first-party install, so the boundary it describes
+is the one Unsloth enforces, and it does not describe the optional engines'
+trust. A request carrying an Unsloth API key can no longer run Python and
+terminal tools unsandboxed and only the Unsloth UI can allow that, which
+tightens the sandbox boundary the 9 October section recorded rather than
+replacing it, and `unsloth start` no longer sends the Unsloth API key in plain
+text through an HTTP proxy to a local Unsloth. The v0.1.905-beta sandboxing
+boundary recorded in the 9 October section still stands as documented in the
+[sandboxing guide](https://unsloth.ai/docs/new/studio/sandboxing-in-unsloth).
+
+The LoRA, rsLoRA and QLoRA documentation pages were re-read for this pass and
+are unchanged, so no equation, no memory formula and no calculator behaviour
+moved. `content/locale-parity.json` keeps its existing 21 September 2026 review
+date because no source digest moved on this pass, and its `stale` list stays
+empty.
