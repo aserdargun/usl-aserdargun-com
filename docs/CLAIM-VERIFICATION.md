@@ -1,17 +1,17 @@
 # Version-sensitive claim verification
 
-Last verified: **2026-10-25**
+Last verified: **2026-10-27**
 
 The application deliberately avoids presenting a planning calculator as a real training run. The following product claims were rechecked against first-party documentation for this release:
 
 | Claim used by the atlas | Evidence and boundary |
 |---|---|
-| LoRA adds trainable low-rank adapters while keeping the base frozen | [Unsloth LoRA hyperparameters guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide/lora-hyperparameters-guide). Rechecked 2026-10-02: the guide states that thin matrices A and B are added to each weight and those are optimized, so roughly 1% of weights train. Module names and supported options remain model/version dependent. |
-| Standard LoRA scale is `alpha / r`; rsLoRA uses `alpha / sqrt(r)` | [Unsloth LoRA hyperparameters guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide/lora-hyperparameters-guide). Rechecked 2026-10-02 against the guide's own equations: `Ŵ = W + (α/rank)·AB` and `Ŵ_rslora = W + (α/√rank)·AB`, with `use_rslora = True` selecting the second. The guide's own recommendation is `alpha = rank` or `2·rank`, so `alpha/rank ≥ 1`; the lab exposes both formulas but does not recommend a universal winner. |
-| QLoRA uses a quantized frozen base plus trainable adapters | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The hyperparameters guide states QLoRA is 4-bit fine-tuning using much less VRAM (4× less than 16-bit LoRA) and that 4-bit precision reduces VRAM by over 75%. This expands feasible configurations but does not guarantee that a model/context/batch fits 16 GB. |
-| Context length, batch size, gradient accumulation, and checkpointing are memory/performance controls | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). The guide gives `Effective Batch Size = batch_size × gradient_accumulation_steps` and describes batch size as the primary driver of VRAM use and gradient accumulation as the primary driver of training time. The 4070 Ti Super card is explicitly a planning simulation until measured on hardware. |
+| LoRA adds trainable low-rank adapters while keeping the base frozen | [Unsloth LoRA hyperparameters guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide/lora-hyperparameters-guide). Rechecked 2026-10-27: the guide states that thin matrices A and B are added to each weight and those are optimized, so roughly 1% of weights train. Module names and supported options remain model/version dependent. |
+| Standard LoRA scale is `alpha / r`; rsLoRA uses `alpha / sqrt(r)` | [Unsloth LoRA hyperparameters guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide/lora-hyperparameters-guide). Rechecked 2026-10-27 against the guide's own equations: `Ŵ = W + (α/rank)·AB` and `Ŵ_rslora = W + (α/√rank)·AB`, with `use_rslora = True` selecting the second. The guide's own recommendation is `alpha = rank` or `2·rank`, so `alpha/rank ≥ 1`; the lab exposes both formulas but does not recommend a universal winner. |
+| QLoRA uses a quantized frozen base plus trainable adapters | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide). Rechecked 2026-10-27: the hyperparameters guide states QLoRA is 4-bit fine-tuning using much less VRAM (4× less than 16-bit LoRA) and that 4-bit precision reduces VRAM by over 75%. This expands feasible configurations but does not guarantee that a model/context/batch fits 16 GB. |
+| Context length, batch size, gradient accumulation, and checkpointing are memory/performance controls | [Unsloth fine-tuning guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide) for the context-length, batch-size and gradient-accumulation settings, and [Unsloth LoRA hyperparameters guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide/lora-hyperparameters-guide) for the batch arithmetic and the checkpointing switch. Rechecked 2026-10-27: the hyperparameters guide gives `Effective Batch Size = batch_size × gradient_accumulation_steps`, describes batch size as the primary driver of VRAM usage and gradient accumulation as the primary driver of training time, and sets `use_gradient_checkpointing = "unsloth"` for very long context. The 4070 Ti Super card is explicitly a planning simulation until measured on hardware. |
 | Azure static Next.js deployment uses `output: "export"` and `out/` | [Azure Static Web Apps Next.js documentation](https://learn.microsoft.com/en-us/azure/static-web-apps/nextjs). The page specifies `output: 'export'` in `next.config.js`, `out` as the default `output_location`, and `IS_STATIC_EXPORT: true` for custom build scripts. This repository enables it only through `IS_STATIC_EXPORT=true`; Vinext uses its normal worker build. |
-| Unsloth release status used during this review | [Unsloth v0.1.910-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.910-beta), published 2026-10-23 at 15:26:53Z, titled "MOSS-Image, Flint & NVIDIA Bolt E4B". It adds Recursive's Flint, a 40B MoE coding-agent model with 2.5B active parameters and a 256K context, which fits in 24 GB at 3-bit at short contexts and scores 89.7 on SWE-bench Pro v2 against Qwen 3.6's 73.8; OpenMOSS's 5.1B MOSS-Image for English or Chinese text inside images, on 16 GB of GPU memory, in GGUF and FP8; and NVIDIA's Nemotron 3.5 Bolt E4B, a Gemma 4 E4B reasoning tune for tool calling, which scores 63.2 on Tau2-Bench against the original's 38.7. It also lets MLX MoE models too large for memory keep their experts on SSD, so Qwen3.8-Flash-Next runs on a 32 GB Mac; adds a chat-only Unsloth Desktop install that adds training later in Settings; adds MoE expert pruning with REAP, removing 25% or 50% of the least useful experts with `reap_prune` up to 54x faster than llm-compressor's; supports OpenAI's fine-tuning API; and reports DPO and other padded training up to 3.8x faster with less memory on NVIDIA Ampere or newer, attention memory up to 7x smaller on GPUs without bf16, and up to 55% less memory for Parakeet, Canary and CTC speech training. `unsloth train` now also trains vision and, except on Mac, audio models. Two changes tighten security rather than add capability: Unsloth installs, updates and `pip install -U unsloth` now reject eMudhra's compromised emSign certificates, which the release notes say let attackers impersonate websites, while the optional vLLM and SGLang engines still trust them; and a request carrying an Unsloth API key can no longer run Python and terminal tools unsandboxed, only the Unsloth UI can allow that. No release has landed since the previous review: the releases feed still shows v0.1.910-beta (2026-10-23, 15:26:53Z) as the tip, so the release cited above is still the current one. The LoRA, rsLoRA and QLoRA claims above are unchanged; their first-party documentation was re-read for this pass. Every memory, benchmark and performance figure here is the release notes' own and is specific to the named models, hardware and Unsloth's own implementation; none of it generalizes to other models or hardware, none is a training result this atlas produced, and it says nothing about the learner's own card. |
+| Unsloth release status used during this review | [Unsloth v0.1.911-beta release](https://github.com/unslothai/unsloth/releases/tag/v0.1.911-beta), published 2026-10-26 at 14:23:54Z, titled "Scheduled + MiniMax-M3.1-Flash + Perf Gains". It adds scheduled prompt runs that can fire once, daily, on weekdays, weekly or monthly, each answer saved as a new chat, on the loaded model, a model on the device or a model from a connected API provider, with per-task notification and with tools and web search off; MiniMax-M3.1-Flash, MiniMax's 428B MoE with 23B active parameters and up to 1M tokens of context, whose GGUF build needs at least 130 GB of combined RAM and VRAM at 1-bit; FLUX 3 image editing; and saved named presets per model in the model picker. For training it adds splitting each layer of a model across GPUs for LoRA and QLoRA through `UNSLOTH_TP_SIZE` with `torchrun`, so each GPU holds less; a fix for 4-bit gpt-oss checkpoints that used to crash on the first training step; and GRPO that generates with vLLM running up to 1.9x faster per step with 16-bit LoRA on Linux with NVIDIA GPUs, and up to 4.4x faster per step without vLLM for Llama and Qwen3 on NVIDIA GPUs. On Mac it reports MLX chats replying up to 16% faster with draft models, MLX models that ship a built-in draft model using it automatically, and Z-Image GGUF text-to-image rendering 1.5-2x faster with the MLX engine. It also fixes GGUF models failing to load on some Windows PCs. Two changes tighten security rather than add capability: apps using an Unsloth API key can no longer approve their own Python or terminal calls to run outside the sandbox, and Unsloth no longer trusts forwarded client IPs by default, so behind your own reverse proxy `UNSLOTH_STUDIO_TRUST_FORWARDED=1` is needed or all users share one login rate limit. No release has landed since the previous review: the releases feed still shows v0.1.911-beta (2026-10-26, 14:23:54Z) as the tip, and the tag list behind it is unchanged at v0.1.910-beta, v0.1.909-beta, v0.1.908-beta, v0.1.907-beta and v0.1.906-beta, so the release cited above is still the current one. The LoRA, rsLoRA and QLoRA claims above are unchanged; their first-party documentation was re-read for this pass. Every memory and performance figure here is the release notes' own, is specific to the named models, hardware and Unsloth's own implementation, and none of it is a training result this atlas produced. |
 
 Reverification rule: whenever the Turkish source digest changes or a version-sensitive product claim changes, update this date, re-check first-party documentation, and keep `content/locale-parity.json.stale` empty before release.
 
@@ -348,3 +348,65 @@ date because no source digest moved on this pass, and its `stale` list stays
 empty. This ledger is not part of the published build, so the deployed site
 will not change its text; that is the expected behaviour of a claim-ledger
 pass, not a missing release.
+
+## Version-sensitive recheck — 2026-10-27
+
+Every row in the table above was re-read against first-party documentation on
+27 October 2026. All six claims still hold. The pinned Unsloth release did move:
+the releases feed now shows v0.1.911-beta (2026-10-26, 14:23:54Z) as the tip, so
+the release cited above is rewritten around that release, and the previous pin,
+v0.1.910-beta of 23 October, is no longer the tip though its material is not
+retracted.
+
+This release is the first in this series whose training changes touch the atlas's
+own subject directly. It adds layer-wise splitting of a model across GPUs for
+LoRA and QLoRA, through `UNSLOTH_TP_SIZE` set to the number of GPUs and
+`torchrun` as the launcher, so that each GPU holds a slice of every layer rather
+than the whole layer. That is a memory-distribution control and not a memory-model
+change: it moves where the weights live across several devices, and the atlas
+still plans against a single card. It also fixes 4-bit gpt-oss checkpoints that
+used to crash on the first training step, which is a defect fix rather than a new
+capability, and reports GRPO generating with vLLM up to 1.9x faster per step with
+16-bit LoRA on Linux with NVIDIA GPUs, and up to 4.4x faster per step without
+vLLM for Llama and Qwen3 on NVIDIA GPUs. Those two figures are the release's own
+measurements on named frameworks, models and GPU vendors, and they describe
+generation speed during reinforcement fine-tuning rather than the LoRA and QLoRA
+path this atlas teaches.
+
+The new headline figures stay attached to named checkpoints on Unsloth's own
+hardware, as the previous passes recorded. MiniMax-M3.1-Flash is a 428B MoE with
+23B active parameters and up to 1M tokens of context, and the release states that
+at 1-bit it needs at least 130 GB of RAM and VRAM combined; that figure belongs
+to that model at that quantization, not to the atlas's teaching model, and no
+figure in it lowers the VRAM numbers the calculator teaches. The Mac figures -
+MLX chats up to 16% faster with draft models, and Z-Image GGUF text-to-image
+rendering 1.5-2x faster with the MLX engine - are Unsloth's own measurements on
+Apple Silicon. The teaching model still excludes quantization metadata, runtime
+workspaces and allocator overhead, so a budget the calculator calls feasible
+remains unproven until it is measured on the card.
+
+The two security changes are recorded as boundaries rather than as capabilities.
+Apps using an Unsloth API key can no longer approve their own Python or terminal
+calls to run outside the sandbox, which tightens the sandbox boundary the 23
+October section recorded rather than replacing it. Unsloth no longer trusts
+forwarded client IPs by default, so an installation behind its own reverse proxy
+has to set `UNSLOTH_STUDIO_TRUST_FORWARDED=1` or every user shares one login
+rate limit. The v0.1.905-beta sandboxing boundary recorded in the 9 October
+section still stands as documented in the
+[sandboxing guide](https://unsloth.ai/docs/new/studio/sandboxing-in-unsloth).
+The scheduled-task surface, the FLUX 3 editing path and the saved model presets
+are Unsloth product surfaces this atlas does not teach, so no row was rewritten
+for them.
+
+The LoRA, rsLoRA and QLoRA documentation pages were re-read for this pass and
+are unchanged, so no equation, no memory formula and no calculator behaviour
+moved. One citation was corrected while reading them: the `Effective Batch
+Size = batch_size × gradient_accumulation_steps` arithmetic, the "primary driver
+of VRAM usage" and "primary driver of training time" wording, and the
+`use_gradient_checkpointing` switch are stated in the hyperparameters guide,
+not in the fine-tuning guide that the row previously linked alone, so the row now
+cites both pages and says which one carries which statement. `content/locale-parity.json`
+keeps its existing 21 September 2026 review date because no source digest moved
+on this pass, and its `stale` list stays empty. This ledger is not part of the
+published build, so the deployed site will not change its text; that is the
+expected behaviour of a claim-ledger pass, not a missing release.
